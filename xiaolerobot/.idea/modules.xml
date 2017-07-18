@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../DemoApplication.iml" filepath="$PROJECT_DIR$/../DemoApplication.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SafeboxMonitrClient.iml" filepath="$PROJECT_DIR$/SafeboxMonitrClient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../app/app.iml" filepath="$PROJECT_DIR$/../app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../sinVoice_source/sinVoice_source.iml" filepath="$PROJECT_DIR$/../sinVoice_source/sinVoice_source.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../unisoundSDKDemo/unisoundSDKDemo.iml" filepath="$PROJECT_DIR$/../unisoundSDKDemo/unisoundSDKDemo.iml" />
+    </modules>
+  </component>
+</project>
