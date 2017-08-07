@@ -28,6 +28,7 @@ import com.xiaole.xiaolerobot.R;
 /**
  * com.yuntongxun.ecdemo.ui.voip in ECDemo_Android
  * Created by Jorstin on 2015/7/3.
+ * modified by tiejiang on 201707
  */
 public class VoIPCallActivity extends ECVoIPBaseActivity implements VoIPCallHelper.OnCallEventNotifyListener
         , ECCallControlUILayout.OnCallControlDelegate
