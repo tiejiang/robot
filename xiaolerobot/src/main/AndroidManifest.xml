@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.safeboxmonitor">
+    package="com.xiaole.xiaolerobot">
 
     <application
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:name="com.example.safeboxmonitor.application.Application">
+        android:name="com.xiaole.xiaolerobot.application.Application">
 
         <activity
-            android:name="com.example.safeboxmonitor.ui.activity.MenuActivity"
+            android:name="com.xiaole.xiaolerobot.ui.activity.MenuActivity"
             android:theme="@style/Theme.AppCompat">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -18,10 +18,10 @@
         </activity>
 
         <activity
-            android:name="com.example.safeboxmonitor.ui.activity.RemoteControlCommandActivity">
+            android:name="com.xiaole.xiaolerobot.ui.activity.RemoteControlCommandActivity">
         </activity>
         <activity
-            android:name="com.example.safeboxmonitor.ui.activity.VoIPCallActivity"
+            android:name="com.xiaole.xiaolerobot.ui.activity.VoIPCallActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
@@ -32,16 +32,24 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.example.safeboxmonitor.ui.activity.VideoActivity"
+            android:name="com.xiaole.xiaolerobot.ui.activity.VideoActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
             <intent-filter>
-                <action android:name="con.yuntongxun.ecdemo.intent.ACTION_VIDEO_CALL" />
+                <action android:name="com.yuntongxun.ecdemo.intent.ACTION_VIDEO_CALL" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.xiaole.xiaolerobot.ui.activity.UartTestActivity">
+        </activity>
+        <activity
+            android:name="com.xiaole.xiaolerobot.ui.activity.base.SerialPortActivity"
+            ></activity>
+
+
         // SDK核心服务配置
         <service android:name="com.yuntongxun.ecsdk.ECClientService"
             android:enabled="true" android:process=":push" />
@@ -77,7 +85,7 @@
 
         // 声明自定义通知的广播接收器（需要替换包名，详见注意事项）
         <receiver
-            android:name="com.example.safeboxmonitor.service.YuntxNotifyReceiver"
+            android:name="com.xiaole.xiaolerobot.service.YuntxNotifyReceiver"
             android:exported="false">
             <intent-filter>
                 // 接收push消息
