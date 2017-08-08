@@ -2,7 +2,11 @@ package com.xiaole.xiaolerobot.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -14,12 +18,16 @@ import com.xiaole.xiaolerobot.common.CCPAppManager;
 import com.xiaole.xiaolerobot.core.ClientUser;
 import com.xiaole.xiaolerobot.ui.helper.IMChattingHelper;
 import com.xiaole.xiaolerobot.ui.helper.SDKCoreHelper;
+import com.xiaole.xiaolerobot.util.Constant;
+import com.xiaole.xiaolerobot.util.mediaplay.StateMusicMediaPlayer;
 import com.yuntongxun.ecsdk.ECError;
 import com.yuntongxun.ecsdk.ECInitParams;
 import com.yuntongxun.ecsdk.ECMessage;
 import com.yuntongxun.ecsdk.ECVoIPCallManager;
 import com.yuntongxun.ecsdk.im.ECTextMessageBody;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -31,6 +39,7 @@ public class MenuActivity extends
         Activity
         implements IMChattingHelper.OnMessageReportCallback, View.OnClickListener {
 
+//    public static final String TAG
     private Button mButtonMonitor;
     private Button mButtonRobotDistribute;
     private Button mButtonDisplay;
@@ -44,6 +53,32 @@ public class MenuActivity extends
     String appKey = "8aaf070858cd982e0158e21ff0000cee";
     String token = "ca8bdec6e6ed3cc369b8122a1c19306d";
     ECInitParams.LoginAuthType mLoginAuthType = ECInitParams.LoginAuthType.NORMAL_AUTH;
+
+    private ArrayList<HashMap<String, Object>> myMediaList = new ArrayList<HashMap<String, Object>>();
+
+    //处理系统运行状态的Handler
+    private Handler mStateManagementHandler = new Handler(){
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what){
+                //开机广播收到后，不能立即从ｓｄｃａｒｄ当中读取媒体内容播放，因为此时的ｓｄｃａｒｄ内容尚未读出
+                case Constant.BOOT_COMPLETED_FROM_BROADCASTRECEIVER:
+
+                    break;
+                //ｓｄｃａｒｄ卡媒体内容加载完毕（才能进行所有媒体库内容播放）
+                case Constant.SEARCH_MEDIASOURCE_COMPLETED_FROM_SDCARD:
+                    String musicPath = (String) myMediaList.get(0).get("musicFileUrl");
+                    Log.d(Constant.TAG, "musicPath= " + musicPath);
+                    new StateMusicMediaPlayer(musicPath).playStateMusic();
+                    break;
+
+
+
+            }
+        }
+    };
 
 
     @Override
@@ -73,6 +108,8 @@ public class MenuActivity extends
         mButtonDisplay.setOnClickListener(this);
 
         uart_test.setOnClickListener(this);
+        new Thread(new mMediaSearchThread()).start();
+
     }
 
 
@@ -101,10 +138,69 @@ public class MenuActivity extends
                 Intent mIntent = new Intent();
                 mIntent.setClass(MenuActivity.this, UartTestActivity.class);
                 startActivity(mIntent);
+                break;
 
         }
     }
 
+    //搜索ＳＤ卡媒体内容
+    class mMediaSearchThread implements Runnable{
+
+        @Override
+        public void run() {
+            myMediaList = scanAllAudioFiles();
+//            for (int i=0; i<myMediaList.size(); i++){
+//                Log.d(Constant.TAG, "path List= " + myMediaList.get(i).get("musicFileUrl"));
+//            }
+            Message mMessage = new Message();
+            mMessage.what = Constant.SEARCH_MEDIASOURCE_COMPLETED_FROM_SDCARD;
+            mMessage.obj = "searchMediaCompleted";
+            mStateManagementHandler.sendMessage(mMessage);
+        }
+    }
+    public ArrayList<HashMap<String, Object>> scanAllAudioFiles(){
+        //生成动态集合，用于存储数据
+        ArrayList<HashMap<String, Object>> mylist = new ArrayList<HashMap<String, Object>>();
+
+        //查询媒体数据库
+        Cursor cursor = getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null, null, null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+        //遍历媒体数据库
+        if(cursor.moveToFirst()){
+
+            while (!cursor.isAfterLast()) {
+
+                //歌曲编号
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
+                //歌曲名
+                String tilte = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
+                //歌曲的专辑名：MediaStore.Audio.Media.ALBUM
+                String album = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM));
+                //歌曲的歌手名： MediaStore.Audio.Media.ARTIST
+                String author = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
+                //歌曲文件的路径 ：MediaStore.Audio.Media.DATA
+                String url = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
+                //歌曲的总播放时长 ：MediaStore.Audio.Media.DURATION
+                int duration = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION));
+                //歌曲文件的大小 ：MediaStore.Audio.Media.SIZE
+                Long size = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE));
+
+                if(size>1024*50){//如果文件大小大于50K，将该文件信息存入到map集合中
+                    HashMap<String, Object> map = new HashMap<String, Object>();
+                    map.put("musicId", id);
+                    map.put("musicTitle", tilte);
+                    map.put("musicFileUrl", url);
+                    map.put("music_file_name", tilte);
+                    map.put("music_author",author);
+                    map.put("music_url",url);
+                    map.put("music_duration",duration);
+                    mylist.add(map);
+                }
+                cursor.moveToNext();
+            }
+        }
+        //返回存储数据的集合
+        return mylist;
+    }
 
 
 
@@ -121,11 +217,10 @@ public class MenuActivity extends
             message = ((ECTextMessageBody) msgs.get(i).getBody()).getMessage();
             Log.d("TIEJIANG", "[MainActivity-onPushMessage]" + "i :" + i + ", message = " + message);// add by tiejiang
         }
-
         Log.d("TIEJIANG", "[MainActivity-onPushMessage]" + ",sessionId :" + sessionId);// add by tiejiang
-//mReceiveEditText.setText(message);
         handleSendTextMessage(message + "callback");
     }
+
     /**
      * 处理文本发送方法事件通知
      * @param text

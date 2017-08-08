@@ -3,12 +3,16 @@ package com.xiaole.xiaolerobot.util;
 import java.util.Vector;
 
 public class Constant {
+    public static final String TAG = "TIEJIANG";
     public static final String PREF_PASSWORD_VALUE = "input_password_value";
     public static final String PREF_EMAIL_VALUE = "input_email_value";
     public static final String ACTIVITY_RESULT = "result";
     
     public static final int REQUEST_CODE = 1;
     public static final int ERROE_NUM = 5;
+
+    public static final int BOOT_COMPLETED_FROM_BROADCASTRECEIVER = 0;
+    public static final int SEARCH_MEDIASOURCE_COMPLETED_FROM_SDCARD = 1;
     
     public static Vector<String> mNotEncryptionApp;
     public static void filter(){
