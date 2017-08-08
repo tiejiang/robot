@@ -8,17 +8,24 @@ public class Constant {
     public static final String PREF_EMAIL_VALUE = "input_email_value";
     public static final String ACTIVITY_RESULT = "result";
     
-    public static final int REQUEST_CODE = 1;
-    public static final int ERROE_NUM = 5;
+//    public static final int REQUEST_CODE = 1;
+//    public static final int ERROE_NUM = 5;
 
     public static final int BOOT_COMPLETED_FROM_BROADCASTRECEIVER = 0;
     public static final int SEARCH_MEDIASOURCE_COMPLETED_FROM_SDCARD = 1;
 
     //移动端发送到小乐的控制指令
-    public static final String XIAOLE_FORWARD = "forward";
-    public static final String XIAOLE_BACK = "back";
-    public static final String XIAOLE_LEFT = "left";
-    public static final String XIAOLE_RIGHT = "right";
+    public static final String H3_XIAOLE_FORWARD = "forward";
+    public static final String H3_XIAOLE_BACK = "back";
+    public static final String H3_XIAOLE_LEFT = "left";
+    public static final String H3_XIAOLE_RIGHT = "right";
+
+    //广佳ＡＰＰ发送的广播指令
+    public static final int XIAOLE_FORWARD = 10;
+    public static final int XIAOLE_BACK = 20;
+    public static final int XIAOLE_LEFT = 30;
+    public static final int XIAOLE_RIGHT = 40;
+
 
     //向下位机发送的指令集
     public static byte[] forward = {(byte) 0x00, (byte) 0x01};

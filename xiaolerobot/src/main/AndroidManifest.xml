@@ -49,6 +49,7 @@
             android:name="com.xiaole.xiaolerobot.ui.activity.base.SerialPortActivity"
             ></activity>
 
+
         //监听开机广播启动应用
         <receiver
             android:name="com.xiaole.xiaolerobot.service.PowerBootReceiver">
@@ -169,4 +170,5 @@
     //允许一个程序接收到 ACTION_BOOT_COMPLETED广播在系统完成启动
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 </manifest>

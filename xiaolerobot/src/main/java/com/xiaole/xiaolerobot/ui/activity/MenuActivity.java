@@ -1,22 +1,27 @@
 package com.xiaole.xiaolerobot.ui.activity;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.xiaole.xiaolerobot.R;
 import com.xiaole.xiaolerobot.common.CCPAppManager;
 import com.xiaole.xiaolerobot.core.ClientUser;
-import com.xiaole.xiaolerobot.ui.activity.base.SerialPortActivity;
 import com.xiaole.xiaolerobot.ui.helper.IMChattingHelper;
 import com.xiaole.xiaolerobot.ui.helper.SDKCoreHelper;
 import com.xiaole.xiaolerobot.util.Constant;
@@ -27,7 +32,6 @@ import com.yuntongxun.ecsdk.ECMessage;
 import com.yuntongxun.ecsdk.ECVoIPCallManager;
 import com.yuntongxun.ecsdk.im.ECTextMessageBody;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,8 +41,8 @@ import java.util.List;
  */
 
 public class MenuActivity extends
-        SerialPortActivity
-//        Activity
+//        SerialPortActivity
+        Activity
         implements IMChattingHelper.OnMessageReportCallback, View.OnClickListener {
 
 //    public static final String TAG
@@ -46,6 +50,7 @@ public class MenuActivity extends
     private Button mButtonRobotDistribute;
     private Button mButtonDisplay;
     private Button uart_test;
+    private Button test;
 
     private String nickName = "71707102";
     private String contactID = "71707102";
@@ -56,7 +61,9 @@ public class MenuActivity extends
     String token = "ca8bdec6e6ed3cc369b8122a1c19306d";
     ECInitParams.LoginAuthType mLoginAuthType = ECInitParams.LoginAuthType.NORMAL_AUTH;
 
-    private SendingThread mSendingThread;
+    private LexinApplicationReceiver mLexinApplicationReceiver;
+    private static final String LEXIN_ACTION = "ACTION_LEXIN_TO_YINYU";
+//    private SendingThread mSendingThread;
     private Handler mDataSendHandler;
     //BaseBuffer: mBaseBuffer[2],mBaseBuffer[3] should be replaced by zhe real command
     private byte[] mBaseCommandBuffer = {(byte) 0x53, (byte) 0x4B, (byte) 0x00, (byte) 0x00, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
@@ -64,7 +71,7 @@ public class MenuActivity extends
     private ArrayList<HashMap<String, Object>> myMediaList = new ArrayList<HashMap<String, Object>>();
 
     //处理系统运行状态的Handler
-    private Handler mStateManagementHandler = new Handler(){
+    public Handler mStateManagementHandler = new Handler(){
 
         @Override
         public void handleMessage(Message msg) {
@@ -79,6 +86,9 @@ public class MenuActivity extends
                     String musicPath = (String) myMediaList.get(0).get("musicFileUrl");
                     Log.d(Constant.TAG, "musicPath= " + musicPath);
                     new StateMusicMediaPlayer(musicPath).playStateMusic();
+                    break;
+                case Constant.XIAOLE_FORWARD:
+                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.forward)).sendToTarget();
                     break;
 
 
@@ -109,21 +119,51 @@ public class MenuActivity extends
         mButtonRobotDistribute = (Button)findViewById(R.id.btn_remote_control);
         mButtonDisplay = (Button)findViewById(R.id.btn_audio);
         uart_test = (Button)findViewById(R.id.uart_test);
+        test = (Button)findViewById(R.id.test);
+
+        //使用应用内广播测试应用间广播是否能够收到
+        test.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //发送广播
+                String broadcastIntent = "ACTION_LEXIN_TO_YINYU";
+                Intent intent = new Intent(broadcastIntent);
+                intent.putExtra("FORWARD", "forward");
+                MenuActivity.this.sendBroadcast(intent);
+            }
+        });
 
         mButtonMonitor.setOnClickListener(this);
         mButtonRobotDistribute.setOnClickListener(this);
         mButtonDisplay.setOnClickListener(this);
+
+        //register broadcastreceiver
+        mLexinApplicationReceiver = new LexinApplicationReceiver();
+        IntentFilter mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(LEXIN_ACTION);
+        registerReceiver(mLexinApplicationReceiver, mIntentFilter);
 
         uart_test.setOnClickListener(this);
         //start search sdcard source thread
         new Thread(new mMediaSearchThread()).start();
 
         //start uart/serialport thread
-        if (mSerialPort != null) {
-            mSendingThread = new SendingThread();
-            mSendingThread.start();
-        }
+//        if (mSerialPort != null) {
+//            mSendingThread = new SendingThread();
+//            mSendingThread.start();
+//        }
 
+        // for test/debug
+//        closePort();
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mLexinApplicationReceiver != null){
+            unregisterReceiver(mLexinApplicationReceiver);
+        }
     }
 
     @Override
@@ -156,6 +196,51 @@ public class MenuActivity extends
         }
     }
 
+    class LexinApplicationReceiver extends BroadcastReceiver {
+
+        public Handler mStateManagementHandler;
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            //广播接受
+            if (intent.getAction().equals(LEXIN_ACTION)){
+                Log.d("TIEJIANG", "onReceive---intent.getExtras = " + intent.getStringExtra("FORWARD").toString());
+                if (intent.getStringExtra("FORWARD").equals("forward")){
+                    Log.d("TIEJIANG", "LEXING BROADCASTRECEIVER---" + intent.getStringExtra("FORWARD").toString());
+//                    mStateManagementHandler.sendEmptyMessage(Constant.XIAOLE_FORWARD);
+                }
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("提示")
+                        .setMessage("收到广佳ＡＰＰ应用的广播 value= " + intent.getStringExtra("FORWARD").toString())
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        })
+                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        });
+                AlertDialog dialog = (AlertDialog) builder.create();
+                dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+                dialog.show();
+
+            }
+
+        }
+    }
+
+    //for test/debug
+//    public void closePort(){
+//        mApplication.closeSerialPort();
+//        mSerialPort = null;
+//    }
+
     //将实际指令填充到mBaseCommandBuffer里面
     public byte[] fillCommand(byte[] command){
         mBaseCommandBuffer[2] = command[0];
@@ -164,56 +249,51 @@ public class MenuActivity extends
         return mBaseCommandBuffer;
     }
     //serial port sending thread
-    private class SendingThread extends Thread {
-        @Override
-        public void run() {
-//            int i = 0;
-//            while (i < 10) {
-            Looper.prepare();
-            mDataSendHandler = new Handler(){
-                @Override
-                public void handleMessage(Message msg) {
-                    super.handleMessage(msg);
-                    byte[] buffer = (byte[]) msg.obj;
-                    switch (msg.what){
-                        case 0:
-                            try {
-                                if (mOutputStream != null) {
-                                    mOutputStream.write(buffer);
-                                } else {
-                                    return;
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                                return;
-                            }
-                            break;
-//                        case 1:
-////                            Log.d("TIEJIANG", (buffer)message.obj);
+//    private class SendingThread extends Thread {
+//        @Override
+//        public void run() {
+//            Looper.prepare();
+//            mDataSendHandler = new Handler(){
+//                @Override
+//                public void handleMessage(Message msg) {
+//                    super.handleMessage(msg);
+//                    byte[] buffer = (byte[]) msg.obj;
+//                    switch (msg.what){
+//                        case 0:
+//                            try {
+//                                if (mOutputStream != null) {
+//                                    mOutputStream.write(buffer);
+//                                } else {
+//                                    return;
+//                                }
+//                            } catch (IOException e) {
+//                                e.printStackTrace();
+//                                return;
+//                            }
 //                            break;
-                    }
-
-                }
-            };
-            Looper.loop();
-
-//                i ++;
-//            }
-        }
-    }
+////                        case 1:
+//////                            Log.d("TIEJIANG", (buffer)message.obj);
+////                            break;
+//                    }
+//
+//                }
+//            };
+//            Looper.loop();
+//        }
+//    }
 
     //uart receive data from mcu
-    @Override
-    protected void onDataReceived(byte[] buffer, int size) {
-        //保留作为单片机上发电池状态信息
-//        runOnUiThread(new Runnable() {
-//            public void run() {
-//                if (mReception != null) {
-//                    mReception.append(new String(buffer, 0, size));
-//                }
-//            }
-//        });
-    }
+//    @Override
+//    protected void onDataReceived(byte[] buffer, int size) {
+//        //保留作为单片机上发电池状态信息
+////        runOnUiThread(new Runnable() {
+////            public void run() {
+////                if (mReception != null) {
+////                    mReception.append(new String(buffer, 0, size));
+////                }
+////            }
+////        });
+//    }
 
     //搜索ＳＤ卡媒体内容
     class mMediaSearchThread implements Runnable{
@@ -282,13 +362,13 @@ public class MenuActivity extends
             Log.d(Constant.TAG, "command is invalid");
             return;
         }
-        if (controlCommand.equals(Constant.XIAOLE_FORWARD)){
+        if (controlCommand.equals(Constant.H3_XIAOLE_FORWARD)){
             mDataSendHandler.obtainMessage(0, fillCommand(Constant.H3ControlForward)).sendToTarget();
-        }else if(controlCommand.equals(Constant.XIAOLE_BACK)){
+        }else if(controlCommand.equals(Constant.H3_XIAOLE_BACK)){
             mDataSendHandler.obtainMessage(0, fillCommand(Constant.H3Controlback)).sendToTarget();
-        }else if(controlCommand.equals(Constant.XIAOLE_LEFT)){
+        }else if(controlCommand.equals(Constant.H3_XIAOLE_LEFT)){
             mDataSendHandler.obtainMessage(0, fillCommand(Constant.H3ControlBodyToLeft)).sendToTarget();
-        }else if(controlCommand.equals(Constant.XIAOLE_RIGHT)){
+        }else if(controlCommand.equals(Constant.H3_XIAOLE_RIGHT)){
             mDataSendHandler.obtainMessage(0, fillCommand(Constant.H3ControlBodyToRight)).sendToTarget();
         }
 
