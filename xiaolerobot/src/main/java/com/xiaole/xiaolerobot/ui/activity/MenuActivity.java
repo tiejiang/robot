@@ -1,10 +1,10 @@
 package com.xiaole.xiaolerobot.ui.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.xiaole.xiaolerobot.R;
 import com.xiaole.xiaolerobot.common.CCPAppManager;
 import com.xiaole.xiaolerobot.core.ClientUser;
+import com.xiaole.xiaolerobot.ui.activity.base.SerialPortActivity;
 import com.xiaole.xiaolerobot.ui.helper.IMChattingHelper;
 import com.xiaole.xiaolerobot.ui.helper.SDKCoreHelper;
 import com.xiaole.xiaolerobot.util.Constant;
@@ -26,6 +27,7 @@ import com.yuntongxun.ecsdk.ECMessage;
 import com.yuntongxun.ecsdk.ECVoIPCallManager;
 import com.yuntongxun.ecsdk.im.ECTextMessageBody;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,8 +37,8 @@ import java.util.List;
  */
 
 public class MenuActivity extends
-//        SerialPortActivity
-        Activity
+        SerialPortActivity
+//        Activity
         implements IMChattingHelper.OnMessageReportCallback, View.OnClickListener {
 
 //    public static final String TAG
@@ -53,6 +55,11 @@ public class MenuActivity extends
     String appKey = "8aaf070858cd982e0158e21ff0000cee";
     String token = "ca8bdec6e6ed3cc369b8122a1c19306d";
     ECInitParams.LoginAuthType mLoginAuthType = ECInitParams.LoginAuthType.NORMAL_AUTH;
+
+    private SendingThread mSendingThread;
+    private Handler mDataSendHandler;
+    //BaseBuffer: mBaseBuffer[2],mBaseBuffer[3] should be replaced by zhe real command
+    private byte[] mBaseCommandBuffer = {(byte) 0x53, (byte) 0x4B, (byte) 0x00, (byte) 0x00, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
 
     private ArrayList<HashMap<String, Object>> myMediaList = new ArrayList<HashMap<String, Object>>();
 
@@ -108,10 +115,16 @@ public class MenuActivity extends
         mButtonDisplay.setOnClickListener(this);
 
         uart_test.setOnClickListener(this);
+        //start search sdcard source thread
         new Thread(new mMediaSearchThread()).start();
 
-    }
+        //start uart/serialport thread
+        if (mSerialPort != null) {
+            mSendingThread = new SendingThread();
+            mSendingThread.start();
+        }
 
+    }
 
     @Override
     public void onClick(View v) {
@@ -141,6 +154,65 @@ public class MenuActivity extends
                 break;
 
         }
+    }
+
+    //将实际指令填充到mBaseCommandBuffer里面
+    public byte[] fillCommand(byte[] command){
+        mBaseCommandBuffer[2] = command[0];
+        mBaseCommandBuffer[3] = command[1];
+
+        return mBaseCommandBuffer;
+    }
+    //serial port sending thread
+    private class SendingThread extends Thread {
+        @Override
+        public void run() {
+//            int i = 0;
+//            while (i < 10) {
+            Looper.prepare();
+            mDataSendHandler = new Handler(){
+                @Override
+                public void handleMessage(Message msg) {
+                    super.handleMessage(msg);
+                    byte[] buffer = (byte[]) msg.obj;
+                    switch (msg.what){
+                        case 0:
+                            try {
+                                if (mOutputStream != null) {
+                                    mOutputStream.write(buffer);
+                                } else {
+                                    return;
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                return;
+                            }
+                            break;
+//                        case 1:
+////                            Log.d("TIEJIANG", (buffer)message.obj);
+//                            break;
+                    }
+
+                }
+            };
+            Looper.loop();
+
+//                i ++;
+//            }
+        }
+    }
+
+    //uart receive data from mcu
+    @Override
+    protected void onDataReceived(byte[] buffer, int size) {
+        //保留作为单片机上发电池状态信息
+//        runOnUiThread(new Runnable() {
+//            public void run() {
+//                if (mReception != null) {
+//                    mReception.append(new String(buffer, 0, size));
+//                }
+//            }
+//        });
     }
 
     //搜索ＳＤ卡媒体内容
@@ -202,6 +274,26 @@ public class MenuActivity extends
         return mylist;
     }
 
+    //解析移动端发送的指令
+    public void analysisCommand(String command){
+
+        String controlCommand = command;
+        if (controlCommand == null){
+            Log.d(Constant.TAG, "command is invalid");
+            return;
+        }
+        if (controlCommand.equals(Constant.XIAOLE_FORWARD)){
+            mDataSendHandler.obtainMessage(0, fillCommand(Constant.H3ControlForward)).sendToTarget();
+        }else if(controlCommand.equals(Constant.XIAOLE_BACK)){
+            mDataSendHandler.obtainMessage(0, fillCommand(Constant.H3Controlback)).sendToTarget();
+        }else if(controlCommand.equals(Constant.XIAOLE_LEFT)){
+            mDataSendHandler.obtainMessage(0, fillCommand(Constant.H3ControlBodyToLeft)).sendToTarget();
+        }else if(controlCommand.equals(Constant.XIAOLE_RIGHT)){
+            mDataSendHandler.obtainMessage(0, fillCommand(Constant.H3ControlBodyToRight)).sendToTarget();
+        }
+
+
+    }
 
 
     @Override
@@ -218,7 +310,9 @@ public class MenuActivity extends
             Log.d("TIEJIANG", "[MainActivity-onPushMessage]" + "i :" + i + ", message = " + message);// add by tiejiang
         }
         Log.d("TIEJIANG", "[MainActivity-onPushMessage]" + ",sessionId :" + sessionId);// add by tiejiang
-        handleSendTextMessage(message + "callback");
+        //for test
+//        handleSendTextMessage(message + "callback");
+        analysisCommand(message.trim());
     }
 
     /**

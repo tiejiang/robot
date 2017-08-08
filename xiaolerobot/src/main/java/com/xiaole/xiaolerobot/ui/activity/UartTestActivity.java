@@ -108,10 +108,10 @@ public class UartTestActivity extends SerialPortActivity implements View.OnClick
         mButtonLeft.setOnClickListener(this);
         mButtonRight.setOnClickListener(this);
 
-        if (mSerialPort != null) {
-            mSendingThread = new SendingThread();
-            mSendingThread.start();
-        }
+//        if (mSerialPort != null) {
+//            mSendingThread = new SendingThread();
+//            mSendingThread.start();
+//        }
 //        mBuffer = new byte[1024];
 //        Arrays.fill(mBuffer, (byte) 0x55);   // 0x55 --> U
 //        Arrays.fill(mBuffer, (byte) 0x56);   // 0x56 --> V
@@ -200,22 +200,4 @@ public class UartTestActivity extends SerialPortActivity implements View.OnClick
         }
     }
 
-    //serial port sending thread
-//    private class SendingThread extends Thread {
-//        @Override
-//        public void run() {
-//            while (!isInterrupted()) {
-//                try {
-//                    if (mOutputStream != null) {
-//                        mOutputStream.write(mBuffer);
-//                    } else {
-//                        return;
-//                    }
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                    return;
-//                }
-//            }
-//        }
-//    }
 }
