@@ -32,8 +32,7 @@ public class UartTestActivity extends SerialPortActivity implements View.OnClick
 
     //serial port parameter
     SendingThread mSendingThread;
-//    byte[] mBuffer = {(byte) 0x55, (byte) 0x56};
-    //-----                  S             K            nul         soh           er           er            nl
+    // test buffer           S             K            nul         soh           er           er            nl
     byte[] mBuffer = {(byte) 0x53, (byte) 0x4B, (byte) 0x00, (byte) 0x01, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
     //BaseBuffer: mBaseBuffer[2],mBaseBuffer[3] should be replaced by zhe real command
     private byte[] mBaseCommandBuffer = {(byte) 0x53, (byte) 0x4B, (byte) 0x00, (byte) 0x00, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};

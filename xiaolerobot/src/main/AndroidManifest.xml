@@ -90,23 +90,23 @@
             <intent-filter>
                 // 接收push消息
                 // action匹配规则{packageName + ".action" + "功能"}
-                <action android:name="com.skyee.skyeerobotcleaner.action.VOIP_CALL" />
-                <action android:name="com.skyee.skyeerobotcleaner.action.MESSAGE" />
-                <action android:name="com.skyee.skyeerobotcleaner.action.NOTIFICATION_CLICK" />
-                <action android:name="com.skyee.skyeerobotcleaner.action.PERSON_VERSION" />
+                <action android:name="com.xiaole.xiaolerobot.action.VOIP_CALL" />
+                <action android:name="com.xiaole.xiaolerobot.action.MESSAGE" />
+                <action android:name="com.xiaole.xiaolerobot.action.NOTIFICATION_CLICK" />
+                <action android:name="com.xiaole.xiaolerobot.action.PERSON_VERSION" />
             </intent-filter>
         </receiver>
     </application>
 
 
     //接收IM消息的自定义权限
-    <permission android:name="com.skyee.skyeerobotcleaner.permission.RECEIVE_MSG" android:protectionLevel="signature"/>
+    <permission android:name="com.xiaole.xiaolerobot.permission.RECEIVE_MSG" android:protectionLevel="signature"/>
     //使用接收IM消息权限
-    <uses-permission android:name="com.skyee.skyeerobotcleaner.permission.RECEIVE_MSG"/>
+    <uses-permission android:name="com.xiaole.xiaolerobot.permission.RECEIVE_MSG"/>
     //接收来电的自定义权限
-    <permission android:name="com.skyee.skyeerobotcleaner.permission.INCOMING_CALL" android:protectionLevel="signature"/>
+    <permission android:name="com.xiaole.xiaolerobot.permission.INCOMING_CALL" android:protectionLevel="signature"/>
     //使用接收来电权限
-    <uses-permission android:name="com.skyee.skyeerobotcleaner.permission.INCOMING_CALL"/>
+    <uses-permission android:name="com.xiaole.xiaolerobot.permission.INCOMING_CALL"/>
     //以下为必选配置
     //允许程序打开网络sockets
     <uses-permission android:name="android.permission.INTERNET"/>
