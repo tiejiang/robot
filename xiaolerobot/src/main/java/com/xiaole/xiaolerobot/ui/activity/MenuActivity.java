@@ -1,5 +1,6 @@
 package com.xiaole.xiaolerobot.ui.activity;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -7,7 +8,6 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -19,7 +19,6 @@ import android.widget.Toast;
 import com.xiaole.xiaolerobot.R;
 import com.xiaole.xiaolerobot.common.CCPAppManager;
 import com.xiaole.xiaolerobot.core.ClientUser;
-import com.xiaole.xiaolerobot.ui.activity.base.SerialPortActivity;
 import com.xiaole.xiaolerobot.ui.helper.IMChattingHelper;
 import com.xiaole.xiaolerobot.ui.helper.SDKCoreHelper;
 import com.xiaole.xiaolerobot.util.Constant;
@@ -30,7 +29,6 @@ import com.yuntongxun.ecsdk.ECMessage;
 import com.yuntongxun.ecsdk.ECVoIPCallManager;
 import com.yuntongxun.ecsdk.im.ECTextMessageBody;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,8 +38,8 @@ import java.util.List;
  */
 
 public class MenuActivity extends
-        SerialPortActivity
-//        Activity
+//        SerialPortActivity
+        Activity
         implements IMChattingHelper.OnMessageReportCallback, View.OnClickListener {
 
 //    public static final String TAG
@@ -62,7 +60,7 @@ public class MenuActivity extends
 
     private LexinApplicationReceiver mLexinApplicationReceiver;
     private static final String LEXIN_ACTION = "ACTION_LEXIN_TO_YINYU";
-    private SendingThread mSendingThread;
+//    private SendingThread mSendingThread;
     private Handler mDataSendHandler;
     //BaseBuffer: mBaseBuffer[2],mBaseBuffer[3] should be replaced by zhe real command
     private byte[] mBaseCommandBuffer = {(byte) 0x53, (byte) 0x4B, (byte) 0x00, (byte) 0x00, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
@@ -82,15 +80,13 @@ public class MenuActivity extends
                     break;
                 //ｓｄｃａｒｄ卡媒体内容加载完毕（才能进行所有媒体库内容播放）
                 case Constant.SEARCH_MEDIASOURCE_COMPLETED_FROM_SDCARD:
-                    String musicPath = (String) myMediaList.get(0).get("musicFileUrl");
+                    String musicPath = (String) myMediaList.get(12).get("musicFileUrl");
                     Log.d(Constant.TAG, "musicPath= " + musicPath);
                     new StateMusicMediaPlayer(musicPath).playStateMusic();
                     break;
                 case Constant.XIAOLE_FORWARD:
                     mDataSendHandler.obtainMessage(0, fillCommand(Constant.forward)).sendToTarget();
                     break;
-
-
 
             }
         }
@@ -147,10 +143,10 @@ public class MenuActivity extends
         new Thread(new mMediaSearchThread()).start();
 
         //start uart/serialport thread
-        if (mSerialPort != null) {
-            mSendingThread = new SendingThread();
-            mSendingThread.start();
-        }
+//        if (mSerialPort != null) {
+//            mSendingThread = new SendingThread();
+//            mSendingThread.start();
+//        }
 
         // for test/debug
 //        closePort();
@@ -248,51 +244,51 @@ public class MenuActivity extends
         return mBaseCommandBuffer;
     }
     //serial port sending thread
-    private class SendingThread extends Thread {
-        @Override
-        public void run() {
-            Looper.prepare();
-            mDataSendHandler = new Handler(){
-                @Override
-                public void handleMessage(Message msg) {
-                    super.handleMessage(msg);
-                    byte[] buffer = (byte[]) msg.obj;
-                    switch (msg.what){
-                        case 0:
-                            try {
-                                if (mOutputStream != null) {
-                                    mOutputStream.write(buffer);
-                                } else {
-                                    return;
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                                return;
-                            }
-                            break;
-//                        case 1:
-////                            Log.d("TIEJIANG", (buffer)message.obj);
+//    private class SendingThread extends Thread {
+//        @Override
+//        public void run() {
+//            Looper.prepare();
+//            mDataSendHandler = new Handler(){
+//                @Override
+//                public void handleMessage(Message msg) {
+//                    super.handleMessage(msg);
+//                    byte[] buffer = (byte[]) msg.obj;
+//                    switch (msg.what){
+//                        case 0:
+//                            try {
+//                                if (mOutputStream != null) {
+//                                    mOutputStream.write(buffer);
+//                                } else {
+//                                    return;
+//                                }
+//                            } catch (IOException e) {
+//                                e.printStackTrace();
+//                                return;
+//                            }
 //                            break;
-                    }
-
-                }
-            };
-            Looper.loop();
-        }
-    }
+////                        case 1:
+//////                            Log.d("TIEJIANG", (buffer)message.obj);
+////                            break;
+//                    }
+//
+//                }
+//            };
+//            Looper.loop();
+//        }
+//    }
 
     //uart receive data from mcu
-    @Override
-    protected void onDataReceived(byte[] buffer, int size) {
-        //保留作为单片机上发电池状态信息
-//        runOnUiThread(new Runnable() {
-//            public void run() {
-//                if (mReception != null) {
-//                    mReception.append(new String(buffer, 0, size));
-//                }
-//            }
-//        });
-    }
+//    @Override
+//    protected void onDataReceived(byte[] buffer, int size) {
+//        //保留作为单片机上发电池状态信息
+////        runOnUiThread(new Runnable() {
+////            public void run() {
+////                if (mReception != null) {
+////                    mReception.append(new String(buffer, 0, size));
+////                }
+////            }
+////        });
+//    }
 
     //搜索ＳＤ卡媒体内容
     class mMediaSearchThread implements Runnable{

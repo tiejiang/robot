@@ -316,6 +316,7 @@ public class VideoActivity extends ECVoIPBaseActivity
                             ECPreferenceSettings.SETTINGS_RATIO_CUSTOM.getId(),
                             (String) ECPreferenceSettings.SETTINGS_RATIO_CUSTOM
                                     .getDefaultValue());
+            Log.d("TIEJIANG", "VideoActivity---onResume= " + "ratio= " + ratio);
 
             if (!TextUtils.isEmpty(ratio)) {
                 String[] arr = ratio.split("\\*");
@@ -337,7 +338,9 @@ public class VideoActivity extends ECVoIPBaseActivity
         if (voIPSetupManager == null) {
             return -1;
         }
+        //获取摄像头信息：个数，名称，所持有的分辨率
         CameraInfo[] infos = voIPSetupManager.getCameraInfos();
+        
         for (int i = 0; i < infos.length; i++) {
 
             CameraCapability[] arr = infos[i].caps;
