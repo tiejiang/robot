@@ -67,7 +67,7 @@ public class MenuActivity extends
 
     private ArrayList<HashMap<String, Object>> myMediaList = new ArrayList<HashMap<String, Object>>();
 
-    //处理系统运行状态的Handler
+    //处理系统运行状态　和　语音转写指令　的Handler
     public Handler mStateManagementHandler = new Handler(){
 
         @Override
@@ -86,8 +86,40 @@ public class MenuActivity extends
                     break;
                 case Constant.XIAOLE_FORWARD:
                     mDataSendHandler.obtainMessage(0, fillCommand(Constant.forward)).sendToTarget();
+                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
+                    break;
+                case Constant.XIAOLE_BACK:
+                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.back)).sendToTarget();
+                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
+                    break;
+                case Constant.XIAOLE_LEFT:
+                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.turnLeft)).sendToTarget();
+                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
+                    break;
+                case Constant.XIAOLE_RIGHT:
+                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.turnRight)).sendToTarget();
+                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
+                    break;
+                case Constant.XIAOLE_UP:
+                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.lookUp)).sendToTarget();
+                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
+                    break;
+                case Constant.XIAOLE_DOWN:
+                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.lookDown)).sendToTarget();
+                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
+                    break;
+                case Constant.XIAOLE_DANCE:
+                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.danceModeOne)).sendToTarget();
+                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
                     break;
 
+<<<<<<< HEAD
+=======
+                default: //默认身体回复初始位置
+                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.bodyStop)).sendToTarget();
+                    break;
+
+>>>>>>> tiejiang-test
             }
         }
     };
@@ -123,7 +155,7 @@ public class MenuActivity extends
                 //发送广播
                 String broadcastIntent = "ACTION_LEXIN_TO_YINYU";
                 Intent intent = new Intent(broadcastIntent);
-                intent.putExtra("FORWARD", "forward");
+                intent.putExtra("MESSAGE", "turn_left");
                 MenuActivity.this.sendBroadcast(intent);
             }
         });
@@ -158,6 +190,7 @@ public class MenuActivity extends
         super.onDestroy();
         if (mLexinApplicationReceiver != null){
             unregisterReceiver(mLexinApplicationReceiver);
+            Log.d("TIEJIANG", "MenuActivity---onDestory---mLexinApplicationReceiver---unregist");
         }
     }
 
@@ -183,49 +216,42 @@ public class MenuActivity extends
                 finish();
                 break;
             case R.id.uart_test:
-                Intent mIntent = new Intent();
-                mIntent.setClass(MenuActivity.this, UartTestActivity.class);
-                startActivity(mIntent);
+//                Intent mIntent = new Intent();
+//                mIntent.setClass(MenuActivity.this, UartTestActivity.class);
+//                startActivity(mIntent);
                 break;
 
         }
     }
 
+    //接受乐新smart应用的广播
     class LexinApplicationReceiver extends BroadcastReceiver {
 
-        public Handler mStateManagementHandler;
+//        public Handler mStateManagementHandler;
         @Override
         public void onReceive(Context context, Intent intent) {
-
-            //广播接受
-            if (intent.getAction().equals(LEXIN_ACTION)){
-                Log.d("TIEJIANG", "onReceive---intent.getExtras = " + intent.getStringExtra("FORWARD").toString());
-                if (intent.getStringExtra("FORWARD").equals("forward")){
-                    Log.d("TIEJIANG", "LEXING BROADCASTRECEIVER---" + intent.getStringExtra("FORWARD").toString());
+//            Log.d("TIEJIANG", "LexinApplicationReceiver---onReceive");
+//            //广播接受
+//            if (intent.getAction().equals(LEXIN_ACTION)){
+//                String receiveStr = intent.getStringExtra("MESSAGE").toString().trim();
+//                Log.d("TIEJIANG", "LexinApplicationReceiver---receiveStr = " + receiveStr);
+//                if (receiveStr.equals("forward")){
 //                    mStateManagementHandler.sendEmptyMessage(Constant.XIAOLE_FORWARD);
-                }
-
-//                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//                builder.setTitle("提示")
-//                        .setMessage("收到广佳ＡＰＰ应用的广播 value= " + intent.getStringExtra("FORWARD").toString())
-//                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
+//                }else if(receiveStr.equals("back")){
+//                    mStateManagementHandler.sendEmptyMessage(Constant.XIAOLE_BACK);
+//                }else if(receiveStr.equals("turn_left")){
+//                    mStateManagementHandler.sendEmptyMessage(Constant.XIAOLE_LEFT);
+//                }else if(receiveStr.equals("turn_right")){
+//                    mStateManagementHandler.sendEmptyMessage(Constant.XIAOLE_RIGHT);
+//                }else if(receiveStr.equals("look_up")){
+//                    mStateManagementHandler.sendEmptyMessage(Constant.XIAOLE_UP);
+//                }else if(receiveStr.equals("look_down")){
+//                    mStateManagementHandler.sendEmptyMessage(Constant.XIAOLE_DOWN);
+//                }else if(receiveStr.equals("dance")){
+//                    mStateManagementHandler.sendEmptyMessage(Constant.XIAOLE_DANCE);
+//                }
 //
-//                            }
-//                        })
-//                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-//
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//
-//                            }
-//                        });
-//                AlertDialog dialog = (AlertDialog) builder.create();
-//                dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
-//                dialog.show();
-
-            }
+//            }
 
         }
     }
@@ -243,6 +269,7 @@ public class MenuActivity extends
 
         return mBaseCommandBuffer;
     }
+
     //serial port sending thread
 //    private class SendingThread extends Thread {
 //        @Override

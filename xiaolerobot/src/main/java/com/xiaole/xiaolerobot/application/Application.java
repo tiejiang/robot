@@ -67,12 +67,12 @@ public class Application extends android.app.Application {
 //            String path = sp.getString("DEVICE", "");
 
             String path = "/dev/ttyS0";
-            Log.d("TIEJIANG", "Application---DEVICE path= " + path);
+//            Log.d("TIEJIANG", "Application---DEVICE path= " + path);
 //            int baudrate = Integer.decode(sp.getString("BAUDRATE", "-1"));
 
             int baudrate = 9600;
 //            int baudrate = 115200;
-            Log.d("TIEJIANG", "Application---DEVICE baudrate= " + baudrate);
+//            Log.d("TIEJIANG", "Application---DEVICE baudrate= " + baudrate);
 			/* Check parameters */
             if ((path.length() == 0) || (baudrate == -1)) {
                 throw new InvalidParameterException();

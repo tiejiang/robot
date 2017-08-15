@@ -25,6 +25,9 @@ public class Constant {
     public static final int XIAOLE_BACK = 20;
     public static final int XIAOLE_LEFT = 30;
     public static final int XIAOLE_RIGHT = 40;
+    public static final int XIAOLE_UP = 50;
+    public static final int XIAOLE_DOWN = 60;
+    public static final int XIAOLE_DANCE = 70;
 
 
     //向下位机发送的指令集

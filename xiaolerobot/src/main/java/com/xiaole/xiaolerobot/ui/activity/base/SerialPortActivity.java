@@ -78,7 +78,8 @@ public abstract class SerialPortActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mApplication = (Application) getApplication();
+//        mApplication = (Application) getApplication();
+        mApplication = Application.getInstance();
         try {
             Log.d("TIEJIANG", "SerialPortActivity---onCreate");
             mSerialPort = mApplication.getSerialPort();
