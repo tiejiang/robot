@@ -113,13 +113,10 @@ public class MenuActivity extends
                     Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
                     break;
 
-<<<<<<< HEAD
-=======
                 default: //默认身体回复初始位置
                     mDataSendHandler.obtainMessage(0, fillCommand(Constant.bodyStop)).sendToTarget();
                     break;
 
->>>>>>> tiejiang-test
             }
         }
     };
@@ -182,7 +179,9 @@ public class MenuActivity extends
 
         // for test/debug
 //        closePort();
-
+        //让应用退到后台
+        boolean movetoback = moveTaskToBack(true);
+        Log.d("TIEJIANG", "whether activity goto back or moved = " + movetoback);
     }
 
     @Override
@@ -192,6 +191,14 @@ public class MenuActivity extends
             unregisterReceiver(mLexinApplicationReceiver);
             Log.d("TIEJIANG", "MenuActivity---onDestory---mLexinApplicationReceiver---unregist");
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //视频结束后让应用退到后台
+        boolean movetoback = moveTaskToBack(true);
+        Log.d("TIEJIANG", "whether activity goto back or moved = " + movetoback);
     }
 
     @Override
