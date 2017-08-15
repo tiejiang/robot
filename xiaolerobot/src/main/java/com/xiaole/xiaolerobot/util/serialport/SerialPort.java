@@ -16,8 +16,6 @@
 
 package com.xiaole.xiaolerobot.util.serialport;
 
-import android.util.Log;
-
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
@@ -43,9 +41,7 @@ public class SerialPort {
 				/* Missing read/write permission, trying to chmod the file */
 				Process su;
 				su = Runtime.getRuntime().exec("/system/bin/su");
-				String cmd = "chmod 666 " + device.getAbsolutePath() + "\n"
-//				String cmd = "chmod 777 " + device.getAbsolutePath() + "\n"
-						+ "exit\n";
+				String cmd = "chmod 666 " + device.getAbsolutePath() + "\n" + "exit\n";
 				su.getOutputStream().write(cmd.getBytes());
 				if ((su.waitFor() != 0) || !device.canRead()
 						|| !device.canWrite()) {
@@ -59,7 +55,7 @@ public class SerialPort {
 
 		mFd = open(device.getAbsolutePath(), baudrate, flags);
 		if (mFd == null) {
-			Log.e("TIEJIANG", "native open returns null");
+//			Log.e("TIEJIANG", "native open returns null");
 			throw new IOException();
 		}
 		mFileInputStream = new FileInputStream(mFd);

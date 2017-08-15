@@ -42,12 +42,25 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+<!--
         <activity
             android:name="com.xiaole.xiaolerobot.ui.activity.UartTestActivity">
         </activity>
+-->
+
+        <!---
         <activity
             android:name="com.xiaole.xiaolerobot.ui.activity.base.SerialPortActivity"
             ></activity>
+           -->
+        //乐新广播接收
+        <receiver
+            android:name="com.xiaole.xiaolerobot.service.LexinApplicationReceiver">
+            <intent-filter>
+                <action android:name="ACTION_LEXIN_TO_YINYU"/>
+            </intent-filter>
+
+        </receiver>
 
 
         //监听开机广播启动应用

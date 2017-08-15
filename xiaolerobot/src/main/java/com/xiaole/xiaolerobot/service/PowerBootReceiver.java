@@ -3,7 +3,6 @@ package com.xiaole.xiaolerobot.service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
 
 import com.xiaole.xiaolerobot.ui.activity.MenuActivity;
 
@@ -16,14 +15,13 @@ import static android.content.Intent.ACTION_BOOT_COMPLETED;
 
 public class PowerBootReceiver extends BroadcastReceiver {
 
-    Handler mStateManagementHandler;
     @Override
     public void onReceive(Context context, Intent intent) {
         if(intent.getAction().equals(ACTION_BOOT_COMPLETED)){
-            // 启动应用应用－首界面
+            // 启动应用首界面
             Intent actIntent = new Intent(context.getApplicationContext(), MenuActivity.class);
-//            actIntent.setAction("android.intent.action.MAIN");
-//            actIntent.addCategory("android.intent.category.LAUNCHER");
+            actIntent.setAction("android.intent.action.MAIN");
+            actIntent.addCategory("android.intent.category.LAUNCHER");
             actIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(actIntent);
             //不要在下面添加任何代码－－－２６１７
