@@ -109,6 +109,7 @@ public class UartDataManagement {
         try {
             if (mOutputStream != null) {
                 mOutputStream.write(command);
+                Log.d("TIEJIANG", "FINAL STEP --- send command to MCU");
             } else {
                 return;
             }

@@ -84,38 +84,38 @@ public class MenuActivity extends
                     Log.d(Constant.TAG, "musicPath= " + musicPath);
                     new StateMusicMediaPlayer(musicPath).playStateMusic();
                     break;
-                case Constant.XIAOLE_FORWARD:
-                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.forward)).sendToTarget();
-                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
-                    break;
-                case Constant.XIAOLE_BACK:
-                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.back)).sendToTarget();
-                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
-                    break;
-                case Constant.XIAOLE_LEFT:
-                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.turnLeft)).sendToTarget();
-                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
-                    break;
-                case Constant.XIAOLE_RIGHT:
-                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.turnRight)).sendToTarget();
-                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
-                    break;
-                case Constant.XIAOLE_UP:
-                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.lookUp)).sendToTarget();
-                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
-                    break;
-                case Constant.XIAOLE_DOWN:
-                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.lookDown)).sendToTarget();
-                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
-                    break;
-                case Constant.XIAOLE_DANCE:
-                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.danceModeOne)).sendToTarget();
-                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
-                    break;
-
-                default: //默认身体回复初始位置
-                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.bodyStop)).sendToTarget();
-                    break;
+//                case Constant.XIAOLE_FORWARD:
+//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.forward)).sendToTarget();
+//                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
+//                    break;
+//                case Constant.XIAOLE_BACK:
+//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.back)).sendToTarget();
+//                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
+//                    break;
+//                case Constant.XIAOLE_LEFT:
+//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.turnLeft)).sendToTarget();
+//                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
+//                    break;
+//                case Constant.XIAOLE_RIGHT:
+//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.turnRight)).sendToTarget();
+//                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
+//                    break;
+//                case Constant.XIAOLE_UP:
+//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.lookUp)).sendToTarget();
+//                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
+//                    break;
+//                case Constant.XIAOLE_DOWN:
+//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.lookDown)).sendToTarget();
+//                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
+//                    break;
+//                case Constant.XIAOLE_DANCE:
+//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.danceModeOne)).sendToTarget();
+//                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
+//                    break;
+//
+//                default: //默认身体回复初始位置
+//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.bodyStop)).sendToTarget();
+//                    break;
 
             }
         }
@@ -180,8 +180,8 @@ public class MenuActivity extends
         // for test/debug
 //        closePort();
         //让应用退到后台
-        boolean movetoback = moveTaskToBack(true);
-        Log.d("TIEJIANG", "whether activity goto back or moved = " + movetoback);
+//        boolean movetoback = moveTaskToBack(true);
+//        Log.d("TIEJIANG", "whether activity goto back or moved = " + movetoback);
     }
 
     @Override
@@ -197,8 +197,8 @@ public class MenuActivity extends
     protected void onResume() {
         super.onResume();
         //视频结束后让应用退到后台
-        boolean movetoback = moveTaskToBack(true);
-        Log.d("TIEJIANG", "whether activity goto back or moved = " + movetoback);
+//        boolean movetoback = moveTaskToBack(true);
+//        Log.d("TIEJIANG", "whether activity goto back or moved = " + movetoback);
     }
 
     @Override
@@ -393,14 +393,17 @@ public class MenuActivity extends
         }
         if (controlCommand.equals(Constant.H3_XIAOLE_FORWARD)){
             mDataSendHandler.obtainMessage(0, fillCommand(Constant.H3ControlForward)).sendToTarget();
+            Log.d(Constant.TAG, "MenuActivity---send to MCU---forward");
         }else if(controlCommand.equals(Constant.H3_XIAOLE_BACK)){
             mDataSendHandler.obtainMessage(0, fillCommand(Constant.H3Controlback)).sendToTarget();
+            Log.d(Constant.TAG, "MenuActivity---send to MCU---back");
         }else if(controlCommand.equals(Constant.H3_XIAOLE_LEFT)){
             mDataSendHandler.obtainMessage(0, fillCommand(Constant.H3ControlBodyToLeft)).sendToTarget();
+            Log.d(Constant.TAG, "MenuActivity---send to MCU---turn_left");
         }else if(controlCommand.equals(Constant.H3_XIAOLE_RIGHT)){
             mDataSendHandler.obtainMessage(0, fillCommand(Constant.H3ControlBodyToRight)).sendToTarget();
+            Log.d(Constant.TAG, "MenuActivity---send to MCU---turn_right");
         }
-
 
     }
 

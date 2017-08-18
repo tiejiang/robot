@@ -15,10 +15,10 @@ public class Constant {
     public static final int SEARCH_MEDIASOURCE_COMPLETED_FROM_SDCARD = 1;
 
     //移动端发送到小乐的控制指令
-    public static final String H3_XIAOLE_FORWARD = "forward";
-    public static final String H3_XIAOLE_BACK = "back";
-    public static final String H3_XIAOLE_LEFT = "left";
-    public static final String H3_XIAOLE_RIGHT = "right";
+    public static final String H3_XIAOLE_FORWARD = "mobile_forward";
+    public static final String H3_XIAOLE_BACK = "mobile_back";
+    public static final String H3_XIAOLE_LEFT = "mobile_turn_left";
+    public static final String H3_XIAOLE_RIGHT = "mobile_turn_right";
 
     //广佳ＡＰＰ发送的广播指令
     public static final int XIAOLE_FORWARD = 10;

@@ -25,22 +25,22 @@ public class LexinApplicationReceiver extends BroadcastReceiver {
             String receiveStr = intent.getStringExtra("MESSAGE").toString().trim();
             Log.d("TIEJIANG", "LexinApplicationReceiver---receiveStr = " + receiveStr);
             if (receiveStr.equals("forward")){
-//                mUartDataManagement.sendCommand(mUartDataManagement.fillCommand(Constant.forward));
-                mUartDataManagement.sendCommand(UartDataManagement.abc);
+                mUartDataManagement.sendCommand(mUartDataManagement.fillCommand(Constant.forward));
+//                mUartDataManagement.sendCommand(UartDataManagement.abc);
                 Log.d("TIEJIANG", "LexinApplicationReceiver---forward");
             }else if(receiveStr.equals("back")){
-//                mUartDataManagement.sendCommand(mUartDataManagement.fillCommand(Constant.back));
-                mUartDataManagement.sendCommand(UartDataManagement.abcd);
+                mUartDataManagement.sendCommand(mUartDataManagement.fillCommand(Constant.back));
+//                mUartDataManagement.sendCommand(UartDataManagement.abcd);
                 Log.d("TIEJIANG", "LexinApplicationReceiver---back");
 //                mStateManagementHandler.sendEmptyMessage(Constant.XIAOLE_BACK);
             }else if(receiveStr.equals("turn_left")){
-//                mUartDataManagement.sendCommand(mUartDataManagement.fillCommand(Constant.turnLeft));
-                mUartDataManagement.sendCommand(UartDataManagement.abce);
+                mUartDataManagement.sendCommand(mUartDataManagement.fillCommand(Constant.turnLeft));
+//                mUartDataManagement.sendCommand(UartDataManagement.abce);
                 Log.d("TIEJIANG", "LexinApplicationReceiver---turn_left");
 //                mStateManagementHandler.sendEmptyMessage(Constant.XIAOLE_LEFT);
             }else if(receiveStr.equals("turn_right")){
-//                mUartDataManagement.sendCommand(mUartDataManagement.fillCommand(Constant.turnRight));
-                mUartDataManagement.sendCommand(UartDataManagement.abcf);
+                mUartDataManagement.sendCommand(mUartDataManagement.fillCommand(Constant.turnRight));
+//                mUartDataManagement.sendCommand(UartDataManagement.abcf);
                 Log.d("TIEJIANG", "LexinApplicationReceiver---turn_right");
 //                mStateManagementHandler.sendEmptyMessage(Constant.XIAOLE_RIGHT);
             }else if(receiveStr.equals("look_up")){
