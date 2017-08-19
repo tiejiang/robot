@@ -67,6 +67,7 @@ public class Application extends android.app.Application {
 //            String path = sp.getString("DEVICE", "");
 
             String path = "/dev/ttyS0";
+//            String path = "/dev/ttyS2";
 //            Log.d("TIEJIANG", "Application---DEVICE path= " + path);
 //            int baudrate = Integer.decode(sp.getString("BAUDRATE", "-1"));
 

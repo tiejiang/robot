@@ -1,5 +1,8 @@
 package com.xiaole.xiaolerobot.util.serialportdatamanagement;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 
 import com.xiaole.xiaolerobot.application.Application;
@@ -29,6 +32,8 @@ public class UartDataManagement {
     protected OutputStream mOutputStream;
     private InputStream mInputStream;
     private ReadThread mReadThread;
+    public static Handler mDataSendHandler;
+    private SendingThread mSendingThread;
     private static UartDataManagement uartInstance = null;
 
     public static UartDataManagement getUartInstance(){
@@ -57,6 +62,11 @@ public class UartDataManagement {
         } catch (InvalidParameterException e) {
 //            DisplayError(R.string.error_configuration);
             Log.d("TIEJIANG", "Please configure your serial port first.");
+        }
+
+        if (mSerialPort != null) {
+            mSendingThread = new SendingThread();
+            mSendingThread.start();
         }
     }
 
@@ -109,7 +119,7 @@ public class UartDataManagement {
         try {
             if (mOutputStream != null) {
                 mOutputStream.write(command);
-                Log.d("TIEJIANG", "FINAL STEP --- send command to MCU");
+                Log.d("TIEJIANG", "UI thread---FINAL STEP --- send command to MCU");
             } else {
                 return;
             }
@@ -119,39 +129,42 @@ public class UartDataManagement {
         }
 
     }
+
     //serial port sending thread
-//    private class SendingThread extends Thread {
-//        @Override
-//        public void run() {
-//            Looper.prepare();
-//            mDataSendHandler = new Handler(){
-//                @Override
-//                public void handleMessage(Message msg) {
-//                    super.handleMessage(msg);
-//                    byte[] buffer = (byte[]) msg.obj;
-//                    switch (msg.what){
-//                        case 0:
-//                            try {
-//                                if (mOutputStream != null) {
-//                                    mOutputStream.write(buffer);
-//                                } else {
-//                                    return;
-//                                }
-//                            } catch (IOException e) {
-//                                e.printStackTrace();
-//                                return;
-//                            }
+    public class SendingThread extends Thread {
+        @Override
+        public void run() {
+            Looper.prepare();
+            mDataSendHandler = new Handler(){
+                @Override
+                public void handleMessage(Message msg) {
+                    super.handleMessage(msg);
+                    Log.d("TIEJIANG", "other thread---FINAL STEP --- handle message");
+                    byte[] buffer = (byte[]) msg.obj;
+                    switch (msg.what){
+                        case 0:
+                            try {
+                                if (mOutputStream != null) {
+                                    mOutputStream.write(buffer);
+                                    Log.d("TIEJIANG", "other thread---FINAL STEP --- send command to MCU");
+                                } else {
+                                    return;
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                return;
+                            }
+                            break;
+//                        case 1:
+////                            Log.d("TIEJIANG", (buffer)message.obj);
 //                            break;
-////                        case 1:
-//////                            Log.d("TIEJIANG", (buffer)message.obj);
-////                            break;
-//                    }
-//
-//                }
-//            };
-//            Looper.loop();
-//        }
-//    }
+                    }
+
+                }
+            };
+            Looper.loop();
+        }
+    }
 
     //关闭串口,线程等
     public void close(){

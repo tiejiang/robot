@@ -1,10 +1,6 @@
 package com.xiaole.xiaolerobot.ui.activity;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,6 +19,7 @@ import com.xiaole.xiaolerobot.ui.helper.IMChattingHelper;
 import com.xiaole.xiaolerobot.ui.helper.SDKCoreHelper;
 import com.xiaole.xiaolerobot.util.Constant;
 import com.xiaole.xiaolerobot.util.mediaplay.StateMusicMediaPlayer;
+import com.xiaole.xiaolerobot.util.serialportdatamanagement.UartDataManagement;
 import com.yuntongxun.ecsdk.ECError;
 import com.yuntongxun.ecsdk.ECInitParams;
 import com.yuntongxun.ecsdk.ECMessage;
@@ -32,6 +29,8 @@ import com.yuntongxun.ecsdk.im.ECTextMessageBody;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static com.xiaole.xiaolerobot.util.serialportdatamanagement.UartDataManagement.mDataSendHandler;
 
 /**
  * Created by Administrator on 2016/11/21.
@@ -57,11 +56,12 @@ public class MenuActivity extends
     String appKey = "8aaf070858cd982e0158e21ff0000cee";
     String token = "ca8bdec6e6ed3cc369b8122a1c19306d";
     ECInitParams.LoginAuthType mLoginAuthType = ECInitParams.LoginAuthType.NORMAL_AUTH;
+    private UartDataManagement mUartManagement = UartDataManagement.getUartInstance();
 
-    private LexinApplicationReceiver mLexinApplicationReceiver;
+//    private LexinApplicationReceiver mLexinApplicationReceiver;
     private static final String LEXIN_ACTION = "ACTION_LEXIN_TO_YINYU";
 //    private SendingThread mSendingThread;
-    private Handler mDataSendHandler;
+//    private Handler mDataSendHandler;
     //BaseBuffer: mBaseBuffer[2],mBaseBuffer[3] should be replaced by zhe real command
     private byte[] mBaseCommandBuffer = {(byte) 0x53, (byte) 0x4B, (byte) 0x00, (byte) 0x00, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
 
@@ -143,29 +143,29 @@ public class MenuActivity extends
         mButtonRobotDistribute = (Button)findViewById(R.id.btn_remote_control);
         mButtonDisplay = (Button)findViewById(R.id.btn_audio);
         uart_test = (Button)findViewById(R.id.uart_test);
-        test = (Button)findViewById(R.id.test);
+//        test = (Button)findViewById(R.id.test);
 
         //使用应用内广播测试应用间广播是否能够收到
-        test.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //发送广播
-                String broadcastIntent = "ACTION_LEXIN_TO_YINYU";
-                Intent intent = new Intent(broadcastIntent);
-                intent.putExtra("MESSAGE", "turn_left");
-                MenuActivity.this.sendBroadcast(intent);
-            }
-        });
+//        test.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                //发送广播
+//                String broadcastIntent = "ACTION_LEXIN_TO_YINYU";
+//                Intent intent = new Intent(broadcastIntent);
+//                intent.putExtra("MESSAGE", "turn_left");
+//                MenuActivity.this.sendBroadcast(intent);
+//            }
+//        });
 
         mButtonMonitor.setOnClickListener(this);
         mButtonRobotDistribute.setOnClickListener(this);
         mButtonDisplay.setOnClickListener(this);
 
         //register broadcastreceiver
-        mLexinApplicationReceiver = new LexinApplicationReceiver();
-        IntentFilter mIntentFilter = new IntentFilter();
-        mIntentFilter.addAction(LEXIN_ACTION);
-        registerReceiver(mLexinApplicationReceiver, mIntentFilter);
+//        mLexinApplicationReceiver = new LexinApplicationReceiver();
+//        IntentFilter mIntentFilter = new IntentFilter();
+//        mIntentFilter.addAction(LEXIN_ACTION);
+//        registerReceiver(mLexinApplicationReceiver, mIntentFilter);
 
         uart_test.setOnClickListener(this);
         //start search sdcard source thread
@@ -187,18 +187,19 @@ public class MenuActivity extends
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mLexinApplicationReceiver != null){
-            unregisterReceiver(mLexinApplicationReceiver);
-            Log.d("TIEJIANG", "MenuActivity---onDestory---mLexinApplicationReceiver---unregist");
-        }
+//        if (mLexinApplicationReceiver != null){
+//            unregisterReceiver(mLexinApplicationReceiver);
+//            Log.d("TIEJIANG", "MenuActivity---onDestory---mLexinApplicationReceiver---unregist");
+//        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        IMChattingHelper.setOnMessageReportCallback(this);
         //视频结束后让应用退到后台
-//        boolean movetoback = moveTaskToBack(true);
-//        Log.d("TIEJIANG", "whether activity goto back or moved = " + movetoback);
+        boolean movetoback = moveTaskToBack(true);
+        Log.d("TIEJIANG", "whether activity goto back or moved = " + movetoback);
     }
 
     @Override
@@ -212,9 +213,9 @@ public class MenuActivity extends
                 break;
             case R.id.btn_remote_control:    //VOIP IM
                 Toast.makeText(MenuActivity.this,"robot_remote_control",Toast.LENGTH_SHORT).show();
-                Intent mRemoteCtrIntent = new Intent();
-                mRemoteCtrIntent.setClass(MenuActivity.this,RemoteControlCommandActivity.class);
-                startActivity(mRemoteCtrIntent);
+//                Intent mRemoteCtrIntent = new Intent();
+//                mRemoteCtrIntent.setClass(MenuActivity.this,RemoteControlCommandActivity.class);
+//                startActivity(mRemoteCtrIntent);
                 break;
             case R.id.btn_audio:    //VOIP audio
                 Toast.makeText(MenuActivity.this,"btn_audio",Toast.LENGTH_SHORT).show();
@@ -231,12 +232,11 @@ public class MenuActivity extends
         }
     }
 
-    //接受乐新smart应用的广播
-    class LexinApplicationReceiver extends BroadcastReceiver {
-
-//        public Handler mStateManagementHandler;
-        @Override
-        public void onReceive(Context context, Intent intent) {
+    //接受乐新smart应用的广播--->已修改为单独一个类的静态广播
+//    class LexinApplicationReceiver extends BroadcastReceiver {
+//
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
 //            Log.d("TIEJIANG", "LexinApplicationReceiver---onReceive");
 //            //广播接受
 //            if (intent.getAction().equals(LEXIN_ACTION)){
@@ -260,8 +260,8 @@ public class MenuActivity extends
 //
 //            }
 
-        }
-    }
+//        }
+//    }
 
     //for test/debug
 //    public void closePort(){
@@ -392,17 +392,21 @@ public class MenuActivity extends
             return;
         }
         if (controlCommand.equals(Constant.H3_XIAOLE_FORWARD)){
+            Log.d("TIEJIANG", "MenuActivity---send to MCU---forward");
+//            mUartManagement.sendCommand(mUartManagement.fillCommand(Constant.H3ControlForward));
             mDataSendHandler.obtainMessage(0, fillCommand(Constant.H3ControlForward)).sendToTarget();
-            Log.d(Constant.TAG, "MenuActivity---send to MCU---forward");
         }else if(controlCommand.equals(Constant.H3_XIAOLE_BACK)){
+//            mUartManagement.sendCommand(mUartManagement.fillCommand(Constant.H3Controlback));
             mDataSendHandler.obtainMessage(0, fillCommand(Constant.H3Controlback)).sendToTarget();
-            Log.d(Constant.TAG, "MenuActivity---send to MCU---back");
+            Log.d("TIEJIANG", "MenuActivity---send to MCU---back");
         }else if(controlCommand.equals(Constant.H3_XIAOLE_LEFT)){
+//            mUartManagement.sendCommand(mUartManagement.fillCommand(Constant.H3ControlBodyToLeft));
             mDataSendHandler.obtainMessage(0, fillCommand(Constant.H3ControlBodyToLeft)).sendToTarget();
-            Log.d(Constant.TAG, "MenuActivity---send to MCU---turn_left");
+            Log.d("TIEJIANG", "MenuActivity---send to MCU---turn_left");
         }else if(controlCommand.equals(Constant.H3_XIAOLE_RIGHT)){
+//            mUartManagement.sendCommand(mUartManagement.fillCommand(Constant.H3ControlBodyToRight));
             mDataSendHandler.obtainMessage(0, fillCommand(Constant.H3ControlBodyToRight)).sendToTarget();
-            Log.d(Constant.TAG, "MenuActivity---send to MCU---turn_right");
+            Log.d("TIEJIANG", "MenuActivity---send to MCU---turn_right");
         }
 
     }
@@ -419,12 +423,14 @@ public class MenuActivity extends
         String message = " ";
         for (int i = 0; i < msgsSize; i++){
             message = ((ECTextMessageBody) msgs.get(i).getBody()).getMessage();
-            Log.d("TIEJIANG", "[MainActivity-onPushMessage]" + "i :" + i + ", message = " + message);// add by tiejiang
+            Log.d("TIEJIANG", "[MenuActivity-onPushMessage]" + "i :" + i + ", message = " + message);// add by tiejiang
         }
-        Log.d("TIEJIANG", "[MainActivity-onPushMessage]" + ",sessionId :" + sessionId);// add by tiejiang
+        Log.d("TIEJIANG", "[MenuActivity-onPushMessage]" + ",sessionId :" + sessionId);// add by tiejiang
         //for test
 //        handleSendTextMessage(message + "callback");
-        analysisCommand(message.trim());
+        //for test end
+
+        analysisCommand(message);
     }
 
     /**

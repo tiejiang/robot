@@ -13,16 +13,15 @@ import android.widget.Toast;
 
 import com.xiaole.xiaolerobot.R;
 import com.xiaole.xiaolerobot.ui.helper.IMChattingHelper;
-import com.yuntongxun.ecsdk.ECError;
 import com.yuntongxun.ecsdk.ECMessage;
 import com.yuntongxun.ecsdk.im.ECTextMessageBody;
-
-import java.util.List;
 /**
  * Created by Administrator on 2016/12/14.
  */
 
-public class RemoteControlCommandActivity extends Activity implements IMChattingHelper.OnMessageReportCallback{
+public class RemoteControlCommandActivity extends Activity
+//        implements IMChattingHelper.OnMessageReportCallback
+{
     private Button mSendButton;
     private EditText mReceiveEditText, mSendEditText;
 
@@ -52,28 +51,28 @@ public class RemoteControlCommandActivity extends Activity implements IMChatting
     @Override
     protected void onResume() {
         super.onResume();
-        IMChattingHelper.setOnMessageReportCallback(this);
+//        IMChattingHelper.setOnMessageReportCallback(this);
         Log.d("TIEJIANG", "TIEJIANG-skyee---[RemoteControlCommandActivity]-onResume");// add by tiejiang
     }
 
 
-    @Override
-    public void onMessageReport(ECError error, ECMessage message) {
-
-    }
-
-    @Override
-    public void onPushMessage(String sessionId, List<ECMessage> msgs) {
-        int msgsSize = msgs.size();
-        String  message = " ";
-        for (int i = 0; i < msgsSize; i++){
-            message = ((ECTextMessageBody) msgs.get(i).getBody()).getMessage();
-            Log.d("TIEJIANG", "[RemoteControlCommandActivity]" + "i = " + i + ", message = " + message);// add by tiejiang
-        }
-
-        Log.d("TIEJIANG", "[RemoteControlCommandActivity]" + ",sessionId = " + sessionId);// add by tiejiang
-        mReceiveEditText.setText(message);
-    }
+//    @Override
+//    public void onMessageReport(ECError error, ECMessage message) {
+//
+//    }
+//
+//    @Override
+//    public void onPushMessage(String sessionId, List<ECMessage> msgs) {
+//        int msgsSize = msgs.size();
+//        String  message = " ";
+//        for (int i = 0; i < msgsSize; i++){
+//            message = ((ECTextMessageBody) msgs.get(i).getBody()).getMessage();
+//            Log.d("TIEJIANG", "[RemoteControlCommandActivity]" + "i = " + i + ", message = " + message);// add by tiejiang
+//        }
+//
+//        Log.d("TIEJIANG", "[RemoteControlCommandActivity]" + ",sessionId = " + sessionId);// add by tiejiang
+//        mReceiveEditText.setText(message);
+//    }
 
     /**
      * 处理文本发送方法事件通知
