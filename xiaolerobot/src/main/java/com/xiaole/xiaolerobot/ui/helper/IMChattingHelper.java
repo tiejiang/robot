@@ -13,7 +13,6 @@
 package com.xiaole.xiaolerobot.ui.helper;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.xiaole.xiaolerobot.common.CCPAppManager;
 import com.xiaole.xiaolerobot.core.ClientUser;
@@ -90,7 +89,7 @@ public class IMChattingHelper implements OnChatReceiveListener,
 	 * @param msg
 	 */
 	public static long sendECMessage(ECMessage msg) {
-		Log.d("TIEJIANG","[IMChattingHelper]-in the sendECMessage method");// add by tiejiang
+//		Log.d("TIEJIANG","[IMChattingHelper]-in the sendECMessage method");// add by tiejiang
 
 
 		// add  by tiejiang to test send message
@@ -148,7 +147,7 @@ public class IMChattingHelper implements OnChatReceiveListener,
 							return ;
 						}
 						// 将发送的消息更新到本地数据库并刷新UI
-						Log.d("TIEJIANG", "[IMChattingHelper]-ECError code = " + error.toString());// add by tiejiang
+//						Log.d("TIEJIANG", "[IMChattingHelper]-ECError code = " + error.toString());// add by tiejiang
 					}
 
 					@Override
@@ -158,7 +157,7 @@ public class IMChattingHelper implements OnChatReceiveListener,
 				});
 
 				String  message = ((ECTextMessageBody) msg.getBody()).getMessage();
-				Log.d("TIEJIANG", "[IMChattingHelper]-send message" + ", msg= " + message);// add by tiejiang
+//				Log.d("TIEJIANG", "[IMChattingHelper]-send message" + ", msg= " + message);// add by tiejiang
 			}
 
 			// 保存发送的消息到数据库
@@ -169,7 +168,7 @@ public class IMChattingHelper implements OnChatReceiveListener,
 //			}
 		} else {
 			msg.setMsgStatus(ECMessage.MessageStatus.FAILED);
-			Log.d("TIEJIANG","[IMChattingHelper]-send message failed");// add by tiejiang
+//			Log.d("TIEJIANG","[IMChattingHelper]-send message failed");// add by tiejiang
 		}
 
 //		if(isSelf){
@@ -394,7 +393,7 @@ public class IMChattingHelper implements OnChatReceiveListener,
 	@Override
 	public void OnReceivedMessage(ECMessage msg) {
 //		LogUtil.d(TAG, "[OnReceivedMessage] show notice true");
-		Log.d("TIEJIANG", "TIEJIANG-skyee---[OnReceivedMessage]-method");// add by tiejiang
+//		Log.d("TIEJIANG", "TIEJIANG-skyee---[OnReceivedMessage]-method");// add by tiejiang
 		if (msg == null) {
 			return;
 		}
@@ -433,7 +432,7 @@ public class IMChattingHelper implements OnChatReceiveListener,
 		// 接收到的IM消息，根据IM消息类型做不同的处理
 		// IM消息类型：ECMessage.Type
 
-		Log.d("TIEJIANG", "TIEJIANG-skyee---[postReceiveMessage]-method");// add by tiejiang
+//		Log.d("TIEJIANG", "TIEJIANG-skyee---[postReceiveMessage]-method");// add by tiejiang
 //		if(msg.getType()== Type.STATE){ //状态消息
 //			String msgTo = msg.getTo();
 //			if(isGroup(msg)){
@@ -606,11 +605,11 @@ public class IMChattingHelper implements OnChatReceiveListener,
 //				LogUtil.e(TAG, "ECMessage fileUrl: null");
 //			}
 //		} else {
-			Log.d("TIEJIANG", "TIEJIANG-skyee---[postReceiveMessage]-IM message deal-1");// add by tiejiang
+//			Log.d("TIEJIANG", "TIEJIANG-skyee---[postReceiveMessage]-IM message deal-1");// add by tiejiang
 			// add if condition to judge the txt type message
 //			if (msg.getType() == Type.TXT){
 				String  message = ((ECTextMessageBody) msg.getBody()).getMessage();
-				Log.d("TIEJIANG", "TIEJIANG-skyee---[postReceiveMessage]-IM message deal-2" + ",message = " + message);// add by tiejiang
+//				Log.d("TIEJIANG", "TIEJIANG-skyee---[postReceiveMessage]-IM message deal-2" + ",message = " + message);// add by tiejiang
 //			}
 //			if(msg.getType() == Type.TXT && msg.getSessionId().toUpperCase().startsWith("G")) {
 //				ECTextMessageBody body = (ECTextMessageBody)msg.getBody();
@@ -629,7 +628,7 @@ public class IMChattingHelper implements OnChatReceiveListener,
 //			return;
 //		}
 		if (mOnMessageReportCallback != null) {
-			Log.d("TIEJIANG", "TIEJIANG---[postReceiveMessage]-IM message deal-3");// add by tiejiang
+//			Log.d("TIEJIANG", "TIEJIANG---[postReceiveMessage]-IM message deal-3");// add by tiejiang
 			ArrayList<ECMessage> msgs = new ArrayList<ECMessage>();
 			msgs.add(msg);
 			mOnMessageReportCallback.onPushMessage(msg.getSessionId(), msgs);
@@ -637,7 +636,7 @@ public class IMChattingHelper implements OnChatReceiveListener,
 
 		// 是否状态栏提示
 		if (showNotice) {
-			Log.d("TIEJIANG", "TIEJIANG---[postReceiveMessage]-IM message deal-4");// add by tiejiang
+//			Log.d("TIEJIANG", "TIEJIANG---[postReceiveMessage]-IM message deal-4");// add by tiejiang
 //			showNotification(msg);
 		}
 	}

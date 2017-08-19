@@ -442,59 +442,59 @@ public class MenuActivity extends
             return ;
         }
         if(text.toString().trim().length() <= 0) {
-//canotSendEmptyMessage();
+        //canotSendEmptyMessage();
             return ;
         }
-// 组建一个待发送的ECMessage
+        // 组建一个待发送的ECMessage
         ECMessage msg = ECMessage.createECMessage(ECMessage.Type.TXT);
-// 设置消息接收者
-//msg.setTo(mRecipients);
+        // 设置消息接收者
+        //msg.setTo(mRecipients);
         msg.setTo("71707102"); // attenionthis number is not the login number! / modified by tiejiang
         ECTextMessageBody msgBody=null;
         Boolean isBQMMMessage=false;
         String emojiNames = null;
-//if(text.toString().contains(CCPChattingFooter2.TXT_MSGTYPE)&& text.toString().contains(CCPChattingFooter2.MSG_DATA)){
-//try {
-//JSONObject jsonObject = new JSONObject(text.toString());
-//String emojiType=jsonObject.getString(CCPChattingFooter2.TXT_MSGTYPE);
-//if(emojiType.equals(CCPChattingFooter2.EMOJITYPE) || emojiType.equals(CCPChattingFooter2.FACETYPE)){//说明是含有BQMM的表情
-//isBQMMMessage=true;
-//emojiNames=jsonObject.getString(CCPChattingFooter2.EMOJI_TEXT);
-//}
-//} catch (JSONException e) {
-//e.printStackTrace();
-//}
-//}
+        //if(text.toString().contains(CCPChattingFooter2.TXT_MSGTYPE)&& text.toString().contains(CCPChattingFooter2.MSG_DATA)){
+        //try {
+            //JSONObject jsonObject = new JSONObject(text.toString());
+            //String emojiType=jsonObject.getString(CCPChattingFooter2.TXT_MSGTYPE);
+            //if(emojiType.equals(CCPChattingFooter2.EMOJITYPE) || emojiType.equals(CCPChattingFooter2.FACETYPE)){//说明是含有BQMM的表情
+            //isBQMMMessage=true;
+            //emojiNames=jsonObject.getString(CCPChattingFooter2.EMOJI_TEXT);
+            //}
+        //} catch (JSONException e) {
+        //e.printStackTrace();
+        //}
+        //}
         if (isBQMMMessage) {
             msgBody = new ECTextMessageBody(emojiNames);
             msg.setBody(msgBody);
             msg.setUserData(text.toString());
         } else {
-// 创建一个文本消息体，并添加到消息对象中
+            // 创建一个文本消息体，并添加到消息对象中
             msgBody = new ECTextMessageBody(text.toString());
             msg.setBody(msgBody);
-            Log.d("TIEJIANG", "[RemoteControlCommandActivity]-handleSendTextMessage" + ", txt = " + text);// add by tiejiang
+            Log.d("TIEJIANG", "[MenuActivity]-handleSendTextMessage" + ", txt = " + text);// add by tiejiang
         }
 
-//String[] at = mChattingFooter.getAtSomeBody();
-//msgBody.setAtMembers(at);
-//mChattingFooter.clearSomeBody();
+            //String[] at = mChattingFooter.getAtSomeBody();
+            //msgBody.setAtMembers(at);
+            //mChattingFooter.clearSomeBody();
         try {
-// 发送消息，该函数见上
+            // 发送消息，该函数见上
             long rowId = -1;
-//if(mCustomerService) {
-//rowId = CustomerServiceHelper.sendMCMessage(msg);
-//} else {
-            Log.d("TIEJIANG", "[RemoteControlCommandActivity]-SendECMessage");// add by tiejiang
+            //if(mCustomerService) {
+            //rowId = CustomerServiceHelper.sendMCMessage(msg);
+            //} else {
+            Log.d("TIEJIANG", "[MenuActivity]-SendECMessage");// add by tiejiang
             rowId = IMChattingHelper.sendECMessage(msg);
 
-//}
-// 通知列表刷新
-//msg.setId(rowId);
-//notifyIMessageListView(msg);
+            //}
+            // 通知列表刷新
+            //msg.setId(rowId);
+            //notifyIMessageListView(msg);
         } catch (Exception e) {
             e.printStackTrace();
-            Log.d("TIEJIANG", "[RemoteControlCommandActivity]-send failed");// add by tiejiang
+            Log.d("TIEJIANG", "[MenuActivity]-send failed");// add by tiejiang
         }
     }
 }
