@@ -80,7 +80,7 @@ public class MenuActivity extends
                     break;
                 //ｓｄｃａｒｄ卡媒体内容加载完毕（才能进行所有媒体库内容播放）
                 case Constant.SEARCH_MEDIASOURCE_COMPLETED_FROM_SDCARD:
-                    String musicPath = (String) myMediaList.get(12).get("musicFileUrl");
+                    String musicPath = (String) myMediaList.get(11).get("musicFileUrl");
                     Log.d(Constant.TAG, "musicPath= " + musicPath);
                     new StateMusicMediaPlayer(musicPath).playStateMusic();
                     break;
@@ -226,6 +226,15 @@ public class MenuActivity extends
 //                startActivity(mIntent);
                 break;
 
+        }
+    }
+
+    //接受移动端发送的ＵＤＰ广播
+    class UDPRunnable implements Runnable{
+
+        @Override
+        public void run() {
+            
         }
     }
 
