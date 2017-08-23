@@ -179,9 +179,6 @@ public class MenuActivity extends
 
         // for test/debug
 //        closePort();
-        //让应用退到后台
-//        boolean movetoback = moveTaskToBack(true);
-//        Log.d("TIEJIANG", "whether activity goto back or moved = " + movetoback);
     }
 
     @Override
