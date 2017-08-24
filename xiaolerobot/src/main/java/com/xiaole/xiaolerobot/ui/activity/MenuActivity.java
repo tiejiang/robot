@@ -1,11 +1,16 @@
 package com.xiaole.xiaolerobot.ui.activity;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -26,10 +31,17 @@ import com.yuntongxun.ecsdk.ECMessage;
 import com.yuntongxun.ecsdk.ECVoIPCallManager;
 import com.yuntongxun.ecsdk.im.ECTextMessageBody;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static android.R.attr.id;
 import static com.xiaole.xiaolerobot.util.serialportdatamanagement.UartDataManagement.mDataSendHandler;
 
 /**
@@ -47,9 +59,16 @@ public class MenuActivity extends
     private Button mButtonDisplay;
     private Button uart_test;
     private Button test;
+    private SharedPreferences mYTXSharedPreferences;
+    private static Handler mYTXInitHandler;
 
-    private String nickName = "71707102";
-    private String contactID = "71707102";
+    /**
+     * nickName, contactID 接收方昵称,ＩＤ
+     * **/
+    private String nickName = "";
+    private String contactID = "";
+
+    private String[] ytxID = new String[2];
 
     String mobile = "20170717";
     String pass = "";
@@ -129,15 +148,30 @@ public class MenuActivity extends
 //        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_menu);
 
-        //save app key/ID and contact number etc. and init rong-lian-yun SDK
-        ClientUser clientUser = new ClientUser(mobile);
-        clientUser.setAppKey(appKey);
-        clientUser.setAppToken(token);
-        clientUser.setLoginAuthType(mLoginAuthType);
-        clientUser.setPassword(pass);
-        CCPAppManager.setClientUser(clientUser);
-        SDKCoreHelper.init(MenuActivity.this, ECInitParams.LoginMode.FORCE_LOGIN);
-        IMChattingHelper.setOnMessageReportCallback(MenuActivity.this);
+        new Thread(new UDPRunnable()).start();
+
+
+        ytxID = getYTXID();
+        if (ytxID[0] != null && ytxID[1] != null){
+            initYTX(ytxID[1]);
+            nickName = ytxID[0];
+            contactID = ytxID[0];
+            Log.d("TIEJIANG", "MenuActivity---onCreat contactID= " + ytxID[0]);
+        }else {
+            mYTXInitHandler = new Handler(){
+                @Override
+                public void handleMessage(Message msg) {
+                    super.handleMessage(msg);
+                    String[] idMsg = (String[])msg.obj;
+                    Log.d("TIEJIANG", "msg= " + idMsg[0] + ", " + idMsg[1]);
+                    if (msg.what == 1){
+                        initYTX(idMsg[1]);
+                        nickName = idMsg[0];
+                        contactID = idMsg[0];
+                    }
+                }
+            };
+        }
 
         mButtonMonitor = (Button)findViewById(R.id.btn_monitor);
         mButtonRobotDistribute = (Button)findViewById(R.id.btn_remote_control);
@@ -229,13 +263,176 @@ public class MenuActivity extends
         }
     }
 
+    public void initYTX(String mobile){
+
+        //save app key/ID and contact number etc. and init rong-lian-yun SDK
+        ClientUser clientUser = new ClientUser(mobile);
+        clientUser.setAppKey(appKey);
+        clientUser.setAppToken(token);
+        clientUser.setLoginAuthType(mLoginAuthType);
+        clientUser.setPassword(pass);
+        CCPAppManager.setClientUser(clientUser);
+        SDKCoreHelper.init(MenuActivity.this, ECInitParams.LoginMode.FORCE_LOGIN);
+        IMChattingHelper.setOnMessageReportCallback(MenuActivity.this);
+        Log.d("TIEJIANG", "MenuActivity---initYTX" + " mobile= " + mobile);
+    }
+
+    // 获得当前ＩＰ
+    public String currentIP() {
+        try {
+            WifiManager wifiMgr = (WifiManager)getSystemService(Context.WIFI_SERVICE);
+            WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
+            int ip = wifiInfo.getIpAddress();
+            return Formatter.formatIpAddress(ip);
+        } catch (Exception ex) {
+        }
+
+        return null;
+    }
+
     //接受移动端发送的ＵＤＰ广播
     class UDPRunnable implements Runnable{
 
         @Override
         public void run() {
-            
+            DatagramSocket ds = null;
+            try{
+                byte[] buf = new byte[1024];
+                //发送数据的packet
+                DatagramPacket dp_send = null;
+                //服务端在21230端口监听接收到的数据
+                ds = new DatagramSocket(21230);
+                //接收从客户端发送过来的数据
+                DatagramPacket dp_receive = new DatagramPacket(buf, 1024);
+                Log.d("TIEJIANG", "MenuActivity---UDPRunnable" + " server is on，waiting for client to send data");
+                boolean f = true;
+                boolean isHandSignal = false;
+                while(f){
+                    //服务器端接收来自客户端的数据
+                    ds.receive(dp_receive);
+                    Log.d("TIEJIANG", "server received data from client：");
+                    String str_receive = new String(dp_receive.getData(),0,dp_receive.getLength());
+                    Log.d("TIEJIANG", "MenuActivity---UDPRunnable" + " str_receive= " + str_receive);
+
+                    isHandSignal = analysisJSONData(str_receive);
+                    if (isHandSignal){
+                        String handShakeSend = handleJSON("handed", currentIP());
+                        dp_send = new DatagramPacket(handShakeSend.getBytes(),handShakeSend.length(),dp_receive.getAddress(),21240);
+                    }else {
+                        String xiaoleSetting = handleJSON("IDSetted", currentIP());
+                        dp_send = new DatagramPacket(xiaoleSetting.getBytes(),xiaoleSetting.length(),dp_receive.getAddress(),21240);
+                    }
+
+                    ds.send(dp_send);
+                    dp_receive.setLength(1024); //数据"清零"
+                }
+            }catch (IOException e){
+                e.printStackTrace();
+                Log.d("TIEJIANG", "MenuActivity---UDPRunnable" + " IOException");
+            }finally {
+                if (ds != null){
+                    ds.close();
+                }
+            }
+
         }
+    }
+
+    public String handleJSON(String state, String host_ip){
+
+        String jsonString = "";
+        try{
+            JSONObject json = new JSONObject();
+            json.put("state", state);
+            json.put("name", "XiaoleServer");
+            json.put("hostip", host_ip);
+
+            jsonString = json.toString();
+
+        }catch (JSONException e){
+            e.printStackTrace();
+
+        }
+        return jsonString;
+
+    }
+
+    /**
+     * return :
+     *  true : YTX ID setted
+     *  false : handed with mobile side
+     * */
+    public boolean analysisJSONData(String json_string){
+
+        String JSONString = json_string;
+        boolean isIDSet = false;
+        if (JSONString == null){
+            return false;
+        }
+        try{
+
+            JSONObject parseH3json = new JSONObject(JSONString);
+            String wanted = parseH3json.getString("wanted");
+            final String hostip = parseH3json.getString("Clientip");
+            String name = parseH3json.getString("name");
+            String clientContent = parseH3json.getString("ClientContent");
+
+            Log.d("TIEJIANG", "MenuActivity---analysisJSONData"
+                    +" wanted= "+wanted+", hostip= "+hostip+", name= "+name+", clientContent= "+clientContent);
+
+            if (wanted.equals("sendYTXID") && name.equals("XiaoleClient") && hostip != null) {
+                String[] ytxID = clientContent.split(",");
+                //存储移动端发来的云通讯ＩＤ(并根据此ＩＤ开始初始化云通讯)
+                saveYTXID(ytxID);
+                isIDSet = true;
+
+            }else if (wanted.equals("search") && name.equals("XiaoleClient") && hostip != null){
+
+                isIDSet = false;
+            }
+        }catch (JSONException e){
+            e.printStackTrace();
+            Log.d("TIEJIANG", "JSONException");
+        }
+        Log.d("TIEJIANG", "MenuActivity---analysisJSONData" + " isIDSet= " + isIDSet);
+        return isIDSet;
+    }
+
+    public String[] getYTXID(){
+
+        String[] YTXID = new String[2];
+        SharedPreferences sp = getSharedPreferences(Constant.USER_MESSAGE, Context.MODE_PRIVATE);
+        String mobileXiaoLe = sp.getString(Constant.MOBILE_ID, "0");
+        String H3XiaoLe = sp.getString(Constant.H3_ID, "1");
+        YTXID[0] = mobileXiaoLe;
+        YTXID[1] = H3XiaoLe;
+
+        return YTXID;
+    }
+
+    //save YTXID
+    public void saveYTXID(String[] ytx_id){
+
+        boolean isSaved = false;
+        String[] id = getYTXID();
+        Log.d("TIEJIANG", " MenuActivity---saveYTXID id[0]= " + id[0] + ", id[1]= " + id[1]);
+        if (id[0].equals("0") && id[1].equals("1")){
+            mYTXSharedPreferences = getSharedPreferences(Constant.USER_MESSAGE, Context.MODE_PRIVATE);
+            SharedPreferences.Editor mEditor = mYTXSharedPreferences.edit();
+            mEditor.putString(Constant.MOBILE_ID, ytx_id[0]);
+            mEditor.putString(Constant.H3_ID, ytx_id[1]);
+            isSaved = mEditor.commit();
+        }else{
+
+        }
+        Log.d("TIEJIANG", " MenuActivity---saveYTXID isSaved= " + isSaved);
+        if (isSaved){
+            //存储成功
+            mYTXInitHandler.obtainMessage(1, ytx_id).sendToTarget();
+        }else {
+            mYTXInitHandler.sendEmptyMessage(0); //存储失败
+        }
+
     }
 
     //接受乐新smart应用的广播--->已修改为单独一个类的静态广播
@@ -413,6 +610,8 @@ public class MenuActivity extends
 //            mUartManagement.sendCommand(mUartManagement.fillCommand(Constant.H3ControlBodyToRight));
             mDataSendHandler.obtainMessage(0, fillCommand(Constant.H3ControlBodyToRight)).sendToTarget();
             Log.d("TIEJIANG", "MenuActivity---send to MCU---turn_right");
+        }else if (controlCommand.equals(Constant.HAND_SHAKE)){  //握手信号
+            handleSendTextMessage(Constant.HAND_OK);
         }
 
     }
@@ -443,7 +642,7 @@ public class MenuActivity extends
      * 处理文本发送方法事件通知
      * @param text
      */
-    public static void handleSendTextMessage(CharSequence text) {
+    public void handleSendTextMessage(CharSequence text) {
         if(text == null) {
             return ;
         }
@@ -455,7 +654,7 @@ public class MenuActivity extends
         ECMessage msg = ECMessage.createECMessage(ECMessage.Type.TXT);
         // 设置消息接收者
         //msg.setTo(mRecipients);
-        msg.setTo("71707102"); // attenionthis number is not the login number! / modified by tiejiang
+        msg.setTo(contactID); // attenionthis number is not the login number! / modified by tiejiang
         ECTextMessageBody msgBody=null;
         Boolean isBQMMMessage=false;
         String emojiNames = null;

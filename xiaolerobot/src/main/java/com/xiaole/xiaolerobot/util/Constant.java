@@ -14,6 +14,15 @@ public class Constant {
     public static final int BOOT_COMPLETED_FROM_BROADCASTRECEIVER = 0;
     public static final int SEARCH_MEDIASOURCE_COMPLETED_FROM_SDCARD = 1;
 
+    //用户的云通信ＩＤ
+    public static final String USER_MESSAGE = "user_data";
+    public static final String MOBILE_ID = "mobile_id";
+    public static final String H3_ID = "h3_id";
+
+    //移动端发来的握手信号
+    public static final String HAND_SHAKE = "hand_shake";
+    public static final String HAND_OK = "handed";
+
     //移动端发送到小乐的控制指令
     public static final String H3_XIAOLE_FORWARD = "mobile_forward";
     public static final String H3_XIAOLE_BACK = "mobile_back";

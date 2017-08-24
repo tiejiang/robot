@@ -52,6 +52,7 @@ public class DemoUtils {
 	/** 当前SDK版本号 */
 	private static int mSdkint = -1;
 
+
 	/**
 	 * 计算语音文件的时间长度
 	 * 
