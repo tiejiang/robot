@@ -240,6 +240,7 @@ public class MenuActivity extends
                 Toast.makeText(MenuActivity.this,"monitor",Toast.LENGTH_SHORT).show();
                 CCPAppManager.callVoIPAction(MenuActivity.this, ECVoIPCallManager.CallType.VIDEO,
                         nickName, contactID,false);
+                Log.d("TIEJIANG", "MenuActivity--- onClick" + " nickName= " + nickName + " contactID= " + contactID);
                 finish();
                 break;
             case R.id.btn_remote_control:    //VOIP IM
@@ -310,7 +311,7 @@ public class MenuActivity extends
                 while(f){
                     //服务器端接收来自客户端的数据
                     ds.receive(dp_receive);
-                    Log.d("TIEJIANG", "server received data from client：");
+//                    Log.d("TIEJIANG", "server received data from client：");
                     String str_receive = new String(dp_receive.getData(),0,dp_receive.getLength());
                     Log.d("TIEJIANG", "MenuActivity---UDPRunnable" + " str_receive= " + str_receive);
 
@@ -429,9 +430,11 @@ public class MenuActivity extends
         if (isSaved){
             //存储成功
             mYTXInitHandler.obtainMessage(1, ytx_id).sendToTarget();
-        }else {
-            mYTXInitHandler.sendEmptyMessage(0); //存储失败
         }
+        //抛出 空指针－－－未找到问题
+//        else {
+//            mYTXInitHandler.obtainMessage(0, "0").sendToTarget(); //存储失败
+//        }
 
     }
 
