@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.xiaole.xiaolerobot.R;
+import com.xiaole.xiaolerobot.application.Application;
 import com.xiaole.xiaolerobot.ui.helper.VoIPCallHelper;
 import com.xiaole.xiaolerobot.util.CallFailReason;
 import com.xiaole.xiaolerobot.util.ECPreferenceSettings;
@@ -64,6 +65,8 @@ public class VideoActivity extends ECVoIPBaseActivity
     private View mCameraSwitch;
     private View video_switch;
     private ECCaptureView mCaptureView;
+
+    protected Application mApplication;
     /**
      * 当前呼叫类型对应的布局
      */
@@ -85,9 +88,15 @@ public class VideoActivity extends ECVoIPBaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ec_video_call);
 
+//        mApplication = Application.getInstance();
+//        mApplication.closeSerialPort(); //开始通话后关闭串口
+
         initVideoLayout();
         isCreated = true;
-        Log.d("TIEJIANG","VideoActivity"); //add by tiejiang
+//        boolean isMute = VoIPCallHelper.getMute();  //静音
+//        setMute();
+//        Log.d("TIEJIANG","VideoActivity---onCreate" + " isMute= " + isMute); //add by tiejiang
+
     }
 
     private void initVideoLayout() {

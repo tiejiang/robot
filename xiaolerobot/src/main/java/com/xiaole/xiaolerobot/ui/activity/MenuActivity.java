@@ -150,6 +150,10 @@ public class MenuActivity extends
 
         new Thread(new UDPRunnable()).start();
 
+        //test code begin
+//        mDataSendHandler.obtainMessage(0, mUartManagement.fillCommand(Constant.forward)).sendToTarget();
+        //test code end
+
 
         ytxID = getYTXID();
         if (ytxID[0] != null && ytxID[1] != null){

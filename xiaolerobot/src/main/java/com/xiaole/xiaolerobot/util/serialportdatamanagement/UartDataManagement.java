@@ -47,6 +47,7 @@ public class UartDataManagement {
 
         mApplication = Application.getInstance();
         try {
+            //ｕａｒｔ调用
             mSerialPort = mApplication.getSerialPort();
             mOutputStream = mSerialPort.getOutputStream();
             mInputStream = mSerialPort.getInputStream();
@@ -57,9 +58,12 @@ public class UartDataManagement {
         } catch (SecurityException e) {
 //            DisplayError(R.string.error_security);
             Log.d("TIEJIANG", "You do not have read/write permission to the serial port.");
-        } catch (IOException e) {
+        }
+        //关闭ｕａｒｔ时对应的ｉｏ异常关闭
+        catch (IOException e) {
             Log.d("TIEJIANG", "unknown error");
-        } catch (InvalidParameterException e) {
+        }
+        catch (InvalidParameterException e) {
 //            DisplayError(R.string.error_configuration);
             Log.d("TIEJIANG", "Please configure your serial port first.");
         }
@@ -69,7 +73,6 @@ public class UartDataManagement {
             mSendingThread.start();
         }
     }
-
 
     private class ReadThread extends Thread {
 
@@ -141,6 +144,24 @@ public class UartDataManagement {
                     super.handleMessage(msg);
                     Log.d("TIEJIANG", "other thread---FINAL STEP --- handle message");
                     byte[] buffer = (byte[]) msg.obj;
+
+                    //test code begin
+//                    while (true){
+//                        try {
+//                            if (mOutputStream != null) {
+//                                mOutputStream.write(abc);
+//                                Log.d("TIEJIANG", "other thread---FINAL STEP --- send command to MCU");
+//                            } else {
+//                                return;
+//                            }
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                            return;
+//                        }
+//                    }
+                    //test code end
+
+
                     switch (msg.what){
                         case 0:
                             try {

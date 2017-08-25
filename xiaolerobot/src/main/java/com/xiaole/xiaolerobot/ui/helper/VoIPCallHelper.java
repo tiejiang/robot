@@ -100,6 +100,7 @@ public class VoIPCallHelper implements OnMakeCallBackListener {
     public static boolean getMute(){
         if(getInstance().mCallSetInterface == null) {
 //            LogUtil.e(TAG , "get mute error : CallSetInterface null");
+            Log.d("TIEJIANG", "VoipCallHelper---get mute error : CallSetInterface null");
             return false;
         }
         return getInstance().mCallSetInterface.getMuteStatus();
