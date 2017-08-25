@@ -70,7 +70,7 @@ public class MenuActivity extends
 
     private String[] ytxID = new String[2];
 
-    String mobile = "20170717";
+//    String mobile = "20170717";
     String pass = "";
     String appKey = "8aaf070858cd982e0158e21ff0000cee";
     String token = "ca8bdec6e6ed3cc369b8122a1c19306d";
