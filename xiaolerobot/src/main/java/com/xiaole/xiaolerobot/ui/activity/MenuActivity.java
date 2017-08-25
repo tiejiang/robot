@@ -161,21 +161,27 @@ public class MenuActivity extends
             nickName = ytxID[0];
             contactID = ytxID[0];
             Log.d("TIEJIANG", "MenuActivity---onCreat contactID= " + ytxID[0]);
-        }else {
-            mYTXInitHandler = new Handler(){
-                @Override
-                public void handleMessage(Message msg) {
-                    super.handleMessage(msg);
-                    String[] idMsg = (String[])msg.obj;
-                    Log.d("TIEJIANG", "msg= " + idMsg[0] + ", " + idMsg[1]);
-                    if (msg.what == 1){
-                        initYTX(idMsg[1]);
-                        nickName = idMsg[0];
-                        contactID = idMsg[0];
-                    }
-                }
-            };
         }
+        //若收到ＩＤ不同，则重新初始化云通讯
+//        mYTXInitHandler = new Handler(){
+//            @Override
+//            public void handleMessage(Message msg) {
+//                super.handleMessage(msg);
+//                if (msg.what == 1){
+//                    String[] idMsg = (String[])msg.obj;
+//                    Log.d("TIEJIANG", "msg= " + idMsg[0] + ", " + idMsg[1]);
+//                    if (msg.what == 1){
+//                        initYTX(idMsg[1]);
+//                        nickName = idMsg[0];
+//                        contactID = idMsg[0];
+//                    }
+//                }else if (msg.what == 0){
+//
+//
+//                }
+//
+//            }
+//        };
 
         mButtonMonitor = (Button)findViewById(R.id.btn_monitor);
         mButtonRobotDistribute = (Button)findViewById(R.id.btn_remote_control);
@@ -375,7 +381,6 @@ public class MenuActivity extends
             return false;
         }
         try{
-
             JSONObject parseH3json = new JSONObject(JSONString);
             String wanted = parseH3json.getString("wanted");
             final String hostip = parseH3json.getString("Clientip");
@@ -421,25 +426,22 @@ public class MenuActivity extends
         boolean isSaved = false;
         String[] id = getYTXID();
         Log.d("TIEJIANG", " MenuActivity---saveYTXID id[0]= " + id[0] + ", id[1]= " + id[1]);
-        if (id[0].equals("0") && id[1].equals("1")){
+        //没有存储　或者　之前有存储，但是（由于移动端重新安装了ＡＰＰ导致重新生成了ＩＤ）和Ｈ３平台不一致，也要重新存储
+        if ((id[0].equals("0") && id[1].equals("1")) || (id[0].length() > 5 && !id[0].equals(ytx_id[0]))){
+
             mYTXSharedPreferences = getSharedPreferences(Constant.USER_MESSAGE, Context.MODE_PRIVATE);
             SharedPreferences.Editor mEditor = mYTXSharedPreferences.edit();
             mEditor.putString(Constant.MOBILE_ID, ytx_id[0]);
             mEditor.putString(Constant.H3_ID, ytx_id[1]);
             isSaved = mEditor.commit();
-        }else{
-
         }
         Log.d("TIEJIANG", " MenuActivity---saveYTXID isSaved= " + isSaved);
         if (isSaved){
-            //存储成功
-            mYTXInitHandler.obtainMessage(1, ytx_id).sendToTarget();
+            //存储成功，并初始化云通讯
+            initYTX(ytx_id[1]);
+            Log.d("TIEJIANG", " MenuActivity---saveYTXID isSaved= " + isSaved + "　initYTX()");
+//            mYTXInitHandler.obtainMessage(1, ytx_id).sendToTarget();
         }
-        //抛出 空指针－－－未找到问题
-//        else {
-//            mYTXInitHandler.obtainMessage(0, "0").sendToTarget(); //存储失败
-//        }
-
     }
 
     //接受乐新smart应用的广播--->已修改为单独一个类的静态广播
