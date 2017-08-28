@@ -11,6 +11,14 @@ public class Constant {
 //    public static final int REQUEST_CODE = 1;
 //    public static final int ERROE_NUM = 5;
 
+    //云通讯ＩＤ
+    //    String appKey = "8aaf070858cd982e0158e21ff0000cee";
+//    String token = "ca8bdec6e6ed3cc369b8122a1c19306d";
+
+    public static final String appKey = "8a216da85e0e48b2015e1c039ba4056e";
+    public static final String token = "4b07cb81f3a95ba0c183181ff04cb394";
+
+
     public static final int BOOT_COMPLETED_FROM_BROADCASTRECEIVER = 0;
     public static final int SEARCH_MEDIASOURCE_COMPLETED_FROM_SDCARD = 1;
 
@@ -19,8 +27,8 @@ public class Constant {
     public static final String MOBILE_ID = "mobile_id";
     public static final String H3_ID = "h3_id";
 
-    //移动端发来的握手信号
-    public static final String HAND_SHAKE = "hand_shake";
+    //移动端通过云通讯ＩＭ发来的握手信号
+    public static final String HAND_SHAKE = "YTXHandshake";
     public static final String HAND_OK = "handed";
 
     //移动端发送到小乐的控制指令
