@@ -44,7 +44,8 @@ public class Constant {
     public static final int XIAOLE_RIGHT = 40;
     public static final int XIAOLE_UP = 50;
     public static final int XIAOLE_DOWN = 60;
-    public static final int XIAOLE_DANCE = 70;
+    public static final int XIAOLE_DANCE_BEGIN = 70;
+    public static final int XIAOLE_DANCE_MUSIC_END = 80;
 
 
     //向下位机发送的指令集
@@ -52,7 +53,7 @@ public class Constant {
     public static byte[] back = {(byte) 0x00, (byte) 0x02};
     public static byte[] turnLeft = {(byte) 0x00, (byte) 0x03};
     public static byte[] turnRight = {(byte) 0x00, (byte) 0x04};
-    public static byte[] bodyStop = {(byte) 0x00, (byte) 0x05};
+    public static byte[] bodyStop = {(byte) 0x00, (byte) 0x05};                   //身停
     public static byte[] turnHeadLeft = {(byte) 0x00, (byte) 0x06};
     public static byte[] turnHeadRight = {(byte) 0x00, (byte) 0x07};              //头右转
     public static byte[] nod = {(byte) 0x00, (byte) 0x025};                       //点头

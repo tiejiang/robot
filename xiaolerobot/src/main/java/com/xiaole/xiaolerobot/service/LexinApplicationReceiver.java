@@ -8,6 +8,7 @@ import android.util.Log;
 import com.xiaole.xiaolerobot.util.Constant;
 import com.xiaole.xiaolerobot.util.serialportdatamanagement.UartDataManagement;
 
+import static com.xiaole.xiaolerobot.ui.activity.MenuActivity.mStateManagementHandler;
 import static com.xiaole.xiaolerobot.util.serialportdatamanagement.UartDataManagement.mDataSendHandler;
 
 /**
@@ -63,6 +64,7 @@ public class LexinApplicationReceiver extends BroadcastReceiver {
 //                mUartDataManagement.sendCommand(mUartDataManagement.fillCommand(Constant.danceModeOne));
                 Log.d("TIEJIANG", "LexinApplicationReceiver---dance");
 //                mStateManagementHandler.sendEmptyMessage(Constant.XIAOLE_DANCE);
+                mStateManagementHandler.sendEmptyMessage(Constant.XIAOLE_DANCE_BEGIN);
                 mDataSendHandler.obtainMessage(0, mUartDataManagement.fillCommand(Constant.danceModeOne)).sendToTarget();
             }
 

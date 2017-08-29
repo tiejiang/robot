@@ -39,6 +39,7 @@ import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,6 +53,14 @@ public class DemoUtils {
 	/** 当前SDK版本号 */
 	private static int mSdkint = -1;
 
+
+	/**
+	 * 获取一个０到制定值之间的随机数
+	 * */
+	public static int getRandomInt(int random){
+		int a = new Random().nextInt(random);
+		return a;
+	}
 
 	/**
 	 * 计算语音文件的时间长度

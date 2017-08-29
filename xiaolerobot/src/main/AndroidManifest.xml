@@ -72,6 +72,11 @@
 
         </receiver>
 
+        //音乐播放的ｓｅｒｖｉｃｅ
+        <service
+            android:name="com.xiaole.xiaolerobot.service.MusicService"
+            />
+
 
 
         // SDK核心服务配置

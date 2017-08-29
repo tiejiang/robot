@@ -2,14 +2,14 @@ package com.xiaole.xiaolerobot.ui.activity;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
+import android.media.MediaPlayer;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.MediaStore;
 import android.text.format.Formatter;
 import android.util.Log;
 import android.view.View;
@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.xiaole.xiaolerobot.R;
 import com.xiaole.xiaolerobot.common.CCPAppManager;
 import com.xiaole.xiaolerobot.core.ClientUser;
+import com.xiaole.xiaolerobot.service.MusicService;
 import com.xiaole.xiaolerobot.ui.helper.IMChattingHelper;
 import com.xiaole.xiaolerobot.ui.helper.SDKCoreHelper;
 import com.xiaole.xiaolerobot.util.Constant;
@@ -40,12 +41,12 @@ import java.net.DatagramSocket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Vector;
 
-import static android.R.attr.id;
-import static android.R.id.message;
-import static com.xiaole.xiaolerobot.util.Constant.appKey;
-import static com.xiaole.xiaolerobot.util.Constant.token;
+import static com.xiaole.xiaolerobot.util.DemoUtils.getRandomInt;
 import static com.xiaole.xiaolerobot.util.serialportdatamanagement.UartDataManagement.mDataSendHandler;
+import static com.yuntongxun.ecsdk.core.ea.a.v;
+import static com.yuntongxun.ecsdk.core.setup.h.m;
 
 /**
  * Created by Administrator on 2016/11/21.
@@ -64,15 +65,13 @@ public class MenuActivity extends
     private Button test;
     private SharedPreferences mYTXSharedPreferences;
     private static Handler mYTXInitHandler;
+    private Context mMenuActivityContext;
+//    private int mDancingSongNum = 0; //the number of the dancing song search from sdcard
 
-    /**
-     * nickName, contactID 接收方昵称,ＩＤ
-     * **/
+    // nickName, contactID 接收方昵称,ＩＤ
     private String nickName = "";
     private String contactID = "";
-
     private String[] ytxID = new String[2];
-
     String pass = "";
     ECInitParams.LoginAuthType mLoginAuthType = ECInitParams.LoginAuthType.NORMAL_AUTH;
     private UartDataManagement mUartManagement = UartDataManagement.getUartInstance();
@@ -84,62 +83,11 @@ public class MenuActivity extends
     //BaseBuffer: mBaseBuffer[2],mBaseBuffer[3] should be replaced by zhe real command
     private byte[] mBaseCommandBuffer = {(byte) 0x53, (byte) 0x4B, (byte) 0x00, (byte) 0x00, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
 
+    private Vector mDanceVector = new Vector();
+    private Vector mWarningToneVector = new Vector();
     private ArrayList<HashMap<String, Object>> myMediaList = new ArrayList<HashMap<String, Object>>();
-
     //处理系统运行状态　和　语音转写指令　的Handler
-    public Handler mStateManagementHandler = new Handler(){
-
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what){
-                //开机广播收到后，不能立即从ｓｄｃａｒｄ当中读取媒体内容播放，因为此时的ｓｄｃａｒｄ内容尚未读出
-                case Constant.BOOT_COMPLETED_FROM_BROADCASTRECEIVER:
-
-                    break;
-                //ｓｄｃａｒｄ卡媒体内容加载完毕（才能进行所有媒体库内容播放）
-                case Constant.SEARCH_MEDIASOURCE_COMPLETED_FROM_SDCARD:
-                    String musicPath = (String) myMediaList.get(11).get("musicFileUrl");
-                    Log.d(Constant.TAG, "musicPath= " + musicPath);
-                    new StateMusicMediaPlayer(musicPath).playStateMusic();
-                    break;
-//                case Constant.XIAOLE_FORWARD:
-//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.forward)).sendToTarget();
-//                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
-//                    break;
-//                case Constant.XIAOLE_BACK:
-//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.back)).sendToTarget();
-//                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
-//                    break;
-//                case Constant.XIAOLE_LEFT:
-//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.turnLeft)).sendToTarget();
-//                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
-//                    break;
-//                case Constant.XIAOLE_RIGHT:
-//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.turnRight)).sendToTarget();
-//                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
-//                    break;
-//                case Constant.XIAOLE_UP:
-//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.lookUp)).sendToTarget();
-//                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
-//                    break;
-//                case Constant.XIAOLE_DOWN:
-//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.lookDown)).sendToTarget();
-//                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
-//                    break;
-//                case Constant.XIAOLE_DANCE:
-//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.danceModeOne)).sendToTarget();
-//                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
-//                    break;
-//
-//                default: //默认身体回复初始位置
-//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.bodyStop)).sendToTarget();
-//                    break;
-
-            }
-        }
-    };
-
+    public static Handler mStateManagementHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,13 +95,17 @@ public class MenuActivity extends
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 //        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_menu);
+        mMenuActivityContext = this;
+        //check and copy database to the dir
+//        new DatabaseCreate(this).createDb();
+        //refresh the database
+        //~~~
 
         new Thread(new UDPRunnable()).start();
 
         //test code begin
 //        mDataSendHandler.obtainMessage(0, mUartManagement.fillCommand(Constant.forward)).sendToTarget();
         //test code end
-
 
         ytxID = getYTXID();
         if (ytxID[0] != null && ytxID[1] != null){
@@ -214,7 +166,7 @@ public class MenuActivity extends
         uart_test.setOnClickListener(this);
         //start search sdcard source thread
         new Thread(new mMediaSearchThread()).start();
-
+        dealSystemRunTimeMission();
         //start uart/serialport thread
 //        if (mSerialPort != null) {
 //            mSendingThread = new SendingThread();
@@ -223,6 +175,7 @@ public class MenuActivity extends
 
         // for test/debug
 //        closePort();
+
     }
 
     @Override
@@ -232,6 +185,12 @@ public class MenuActivity extends
 //            unregisterReceiver(mLexinApplicationReceiver);
 //            Log.d("TIEJIANG", "MenuActivity---onDestory---mLexinApplicationReceiver---unregist");
 //        }
+        if (mDanceVector != null){
+            mDanceVector.removeAllElements();
+        }
+        if(mWarningToneVector != null){
+            mWarningToneVector.removeAllElements();
+        }
     }
 
     @Override
@@ -271,6 +230,122 @@ public class MenuActivity extends
 //                startActivity(mIntent);
                 break;
 
+        }
+    }
+
+    /**
+     * function: deal the system runtime mission
+     *
+     * */
+    public void dealSystemRunTimeMission(){
+
+        mStateManagementHandler = new Handler(){
+
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                switch (msg.what){
+                    //开机广播收到后，不能立即从ｓｄｃａｒｄ当中读取媒体内容播放，因为此时的ｓｄｃａｒｄ内容尚未读出
+                    case Constant.BOOT_COMPLETED_FROM_BROADCASTRECEIVER:
+
+                        break;
+                    //ｓｄｃａｒｄ卡媒体内容加载完毕（才能进行所有媒体库内容播放）
+                    case Constant.SEARCH_MEDIASOURCE_COMPLETED_FROM_SDCARD:
+                        String musicPath = (String) myMediaList.get(10).get("musicFileUrl");
+                        Log.d(Constant.TAG, "musicPath= " + musicPath);
+                        new StateMusicMediaPlayer(musicPath).playStateMusic();
+                        //when the sdcard media source is loaded then to get the detail data
+                        getDancingSongList(myMediaList);
+                        getWarningToneList(myMediaList);
+
+                        break;
+                    case Constant.XIAOLE_DANCE_BEGIN:
+                        //从语音解析到跳舞指令后开始音乐播放（get the random song from vector）
+                        int mDancingSongNum = getRandomInt(mDanceVector.size());
+                        String musicUrl = (String)mDanceVector.get(mDancingSongNum);
+                        Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + " musicUrl= " + musicUrl);
+                        playMusic(musicUrl);
+
+                        break;
+                    case Constant.XIAOLE_DANCE_MUSIC_END:
+                        mDataSendHandler.obtainMessage(0, mUartManagement.fillCommand(Constant.headToMiddle)).sendToTarget();
+                        mDataSendHandler.obtainMessage(0, mUartManagement.fillCommand(Constant.bodyStop)).sendToTarget();
+                        break;
+//                case Constant.XIAOLE_LEFT:
+//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.turnLeft)).sendToTarget();
+//                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
+//                    break;
+//                case Constant.XIAOLE_RIGHT:
+//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.turnRight)).sendToTarget();
+//                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
+//                    break;
+//                case Constant.XIAOLE_UP:
+//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.lookUp)).sendToTarget();
+//                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
+//                    break;
+//                case Constant.XIAOLE_DOWN:
+//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.lookDown)).sendToTarget();
+//                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
+//                    break;
+//                case Constant.XIAOLE_DANCE:
+//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.danceModeOne)).sendToTarget();
+//                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
+//                    break;
+//
+//                default: //默认身体回复初始位置
+//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.bodyStop)).sendToTarget();
+//                    break;
+
+                }
+            }
+        };
+    }
+
+    /**
+     * function: play music in service
+     *
+     * */
+    public void playMusic(String url){
+//        Log.d("TIEJIANG", "MenuActivity---playMusic");
+        Intent intent = new Intent(MenuActivity.this, MusicService.class);
+        intent.putExtra("music_url", url);
+        startService(intent);
+    }
+
+    /**
+     * function: get the dancing song list from myMediaList
+     * @return int: the length of vector
+     * */
+    public int getDancingSongList(ArrayList<HashMap<String, Object>> arrayList){
+
+        String tempUrlString = "";
+        if (arrayList.isEmpty()){
+            return 0;
+        }
+        for (int i=0; i<arrayList.size(); i++){
+            tempUrlString = (String)arrayList.get(i).get("musicFileUrl");
+            if (tempUrlString.contains("dancingSong")){
+                mDanceVector.add(tempUrlString);
+
+            }
+        }
+        return mDanceVector.size();
+    }
+
+    /**
+     * get the warning song list from myMediaList
+     * */
+    public void getWarningToneList(ArrayList<HashMap<String, Object>> arrayList){
+
+        String tempUrlString = "";
+        if (arrayList.isEmpty()){
+            return;
+        }
+        for (int i=0; i<arrayList.size(); i++){
+            tempUrlString = (String)arrayList.get(i).get("musicFileUrl");
+            if (tempUrlString.contains("warningTone")){
+                mWarningToneVector.add(tempUrlString);
+            }
         }
     }
 
@@ -379,8 +454,6 @@ public class MenuActivity extends
      *  1:YTX ID setted
      *  2:handed with mobile side
      *  3:local control command from mobile side
-     *
-     *
      * */
     public int analysisJSONData(String json_string){
 
@@ -554,7 +627,7 @@ public class MenuActivity extends
 
         @Override
         public void run() {
-            myMediaList = scanAllAudioFiles();
+            myMediaList = new StateMusicMediaPlayer(mMenuActivityContext).scanAllAudioFiles();
 //            for (int i=0; i<myMediaList.size(); i++){
 //                Log.d(Constant.TAG, "path List= " + myMediaList.get(i).get("musicFileUrl"));
 //            }
@@ -564,49 +637,7 @@ public class MenuActivity extends
             mStateManagementHandler.sendMessage(mMessage);
         }
     }
-    public ArrayList<HashMap<String, Object>> scanAllAudioFiles(){
-        //生成动态集合，用于存储数据
-        ArrayList<HashMap<String, Object>> mylist = new ArrayList<HashMap<String, Object>>();
 
-        //查询媒体数据库
-        Cursor cursor = getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null, null, null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
-        //遍历媒体数据库
-        if(cursor.moveToFirst()){
-
-            while (!cursor.isAfterLast()) {
-
-                //歌曲编号
-                int id = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
-                //歌曲名
-                String tilte = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
-                //歌曲的专辑名：MediaStore.Audio.Media.ALBUM
-                String album = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM));
-                //歌曲的歌手名： MediaStore.Audio.Media.ARTIST
-                String author = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
-                //歌曲文件的路径 ：MediaStore.Audio.Media.DATA
-                String url = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
-                //歌曲的总播放时长 ：MediaStore.Audio.Media.DURATION
-                int duration = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION));
-                //歌曲文件的大小 ：MediaStore.Audio.Media.SIZE
-                Long size = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE));
-
-                if(size>1024*50){//如果文件大小大于50K，将该文件信息存入到map集合中
-                    HashMap<String, Object> map = new HashMap<String, Object>();
-                    map.put("musicId", id);
-                    map.put("musicTitle", tilte);
-                    map.put("musicFileUrl", url);
-                    map.put("music_file_name", tilte);
-                    map.put("music_author",author);
-                    map.put("music_url",url);
-                    map.put("music_duration",duration);
-                    mylist.add(map);
-                }
-                cursor.moveToNext();
-            }
-        }
-        //返回存储数据的集合
-        return mylist;
-    }
 
     //解析移动端发送的指令（包括通过云通讯ＩＭ和ＵＤＰ发送的两种形式指令）
     public void analysisCommand(String command){

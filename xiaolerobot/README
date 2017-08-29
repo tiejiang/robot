@@ -1,3 +1,30 @@
-注意
+一．注意
 
-串口动态库文件：libSerialPort.so的生成是和对其调用的ｊａｖａ文件（SerialPort.java）所在的包名有关系的,即动态库里面的方法明包含了包名,因此不要随便修改SerialPort.java文件的位置。
+串口动态库文件：libSerialPort.so的生成是和对其调用的java文件（SerialPort.java）所在的包名有关系的,即动态库里面的方法明包含了包名,因此不要随便修改SerialPort.java文件的位置。
+
+二．数据库
+
+媒体信息通过MediaStore.Audio.Media~处获得.
+更新数据库信息，以后用作和移动端同步
+
+数据库名称：xiaole_media.db
+
+数据表: (2)dancingSong (2)warningTone
+
+// 数据库字段
+
+
+//数据表单实例
+
+一：
+id(auto)        path                                    song_name
+0               /storage/sdcard0/media/dancingSong        ~
+1               2013        13
+~               2013        13
+
+
+二：
+id(auto)        path                                    song_name
+0               /storage/sdcard0/media/warningTone         ~
+1               2013        13
+~               2013        13
