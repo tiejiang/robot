@@ -1,14 +1,17 @@
 package com.xiaole.xiaolerobot.ui.activity;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.text.format.Formatter;
 import android.util.Log;
@@ -88,6 +91,19 @@ public class MenuActivity extends
     private ArrayList<HashMap<String, Object>> myMediaList = new ArrayList<HashMap<String, Object>>();
     //处理系统运行状态　和　语音转写指令　的Handler
     public static Handler mStateManagementHandler;
+    private MusicService.MusicPlayBinder musicPlayBinder;
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            musicPlayBinder = (MusicService.MusicPlayBinder)iBinder;
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +116,11 @@ public class MenuActivity extends
 //        new DatabaseCreate(this).createDb();
         //refresh the database
         //~~~
+
+        // bind service
+        Intent bindServiceIntent = new Intent(this, MusicService.class);
+        bindService(bindServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
+
 
         new Thread(new UDPRunnable()).start();
 
@@ -191,6 +212,8 @@ public class MenuActivity extends
         if(mWarningToneVector != null){
             mWarningToneVector.removeAllElements();
         }
+        //unbind service
+        unbindService(mServiceConnection);
     }
 
     @Override
@@ -253,7 +276,8 @@ public class MenuActivity extends
                     case Constant.SEARCH_MEDIASOURCE_COMPLETED_FROM_SDCARD:
                         String musicPath = (String) myMediaList.get(10).get("musicFileUrl");
                         Log.d(Constant.TAG, "musicPath= " + musicPath);
-                        new StateMusicMediaPlayer(musicPath).playStateMusic();
+                        musicPlayBinder.playStateMusic(musicPath);
+//                        new StateMusicMediaPlayer(musicPath).playStateMusic();
                         //when the sdcard media source is loaded then to get the detail data
                         getDancingSongList(myMediaList);
                         getWarningToneList(myMediaList);
@@ -264,7 +288,7 @@ public class MenuActivity extends
                         int mDancingSongNum = getRandomInt(mDanceVector.size());
                         String musicUrl = (String)mDanceVector.get(mDancingSongNum);
                         Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + " musicUrl= " + musicUrl);
-                        playMusic(musicUrl);
+                        musicPlayBinder.playDanceMusic(musicUrl);
 
                         break;
                     case Constant.XIAOLE_DANCE_MUSIC_END:
@@ -305,12 +329,20 @@ public class MenuActivity extends
      * function: play music in service
      *
      * */
-    public void playMusic(String url){
-//        Log.d("TIEJIANG", "MenuActivity---playMusic");
-        Intent intent = new Intent(MenuActivity.this, MusicService.class);
-        intent.putExtra("music_url", url);
-        startService(intent);
-    }
+//    public void playMusic(String url){
+////        Log.d("TIEJIANG", "MenuActivity---playMusic");
+//        Intent intent = new Intent(MenuActivity.this, MusicService.class);
+//        intent.putExtra("music_url", url);
+//        startService(intent);
+//    }
+
+    /**
+     * function: stop play music(stop service)
+     * */
+//    public void stopPlayMusic(){
+//        Intent stopIntent = new Intent(this, MusicService.class);
+//        stopService(stopIntent);
+//    }
 
     /**
      * function: get the dancing song list from myMediaList

@@ -55,7 +55,6 @@ public class RemoteControlCommandActivity extends Activity
         Log.d("TIEJIANG", "TIEJIANG-skyee---[RemoteControlCommandActivity]-onResume");// add by tiejiang
     }
 
-
 //    @Override
 //    public void onMessageReport(ECError error, ECMessage message) {
 //

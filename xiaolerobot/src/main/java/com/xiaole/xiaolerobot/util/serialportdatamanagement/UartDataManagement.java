@@ -67,7 +67,6 @@ public class UartDataManagement {
 //            DisplayError(R.string.error_configuration);
             Log.d("TIEJIANG", "Please configure your serial port first.");
         }
-
         if (mSerialPort != null) {
             mSendingThread = new SendingThread();
             mSendingThread.start();
@@ -79,18 +78,31 @@ public class UartDataManagement {
         @Override
         public void run() {
             super.run();
-            while (!isInterrupted()) {
+//            while (!isInterrupted()) {
+            while (true) {
+                Log.d("TIEJIANG", "UartDataManagement---ReadThread");
                 int size;
                 try {
-                    byte[] buffer = new byte[64];
-                    if (mInputStream == null) return;
+                    byte[] buffer = new byte[32];
+                    if (mInputStream == null){
+                        return;
+                    }
                     size = mInputStream.read(buffer);
+//                    size = mInputStream.read();
+                    Log.d("TIEJIANG", "UartDataManagement---ReadThread---read"+" size= ");
                     if (size > 0) {
                         onDataReceived(buffer, size);
                     }
-                } catch (IOException e) {
+                    Thread.sleep(1000);
+                }
+                catch (IOException e) {
                     e.printStackTrace();
+                    Log.d("TIEJIANG", "UartDataManagement---IOException");
                     return;
+                }
+                catch (InterruptedException e){
+                    e.printStackTrace();
+                    Log.d("TIEJIANG", "UartDataManagement---InterruptedException");
                 }
             }
         }
@@ -98,14 +110,16 @@ public class UartDataManagement {
 
     //uart receive data from mcu
     protected void onDataReceived(byte[] buffer, int size) {
+//        Log.d("TIEJIANG", "UartDataManagement---onDataReceived");
+        if (abc[2] == buffer[2] && abc[3] == abc[3]){
+            Log.d("TIEJIANG", "UartDataManagement---onDataReceived");
+        }
+//        for (int i=0; i<buffer.length; i++){
+            String str = new String(buffer);
+        Log.d("TIEJIANG", "UartDataManagement---onDataReceived" + " str= " + str);
+//        }
         //保留作为单片机上发电池状态信息
-//        runOnUiThread(new Runnable() {
-//            public void run() {
-//                if (mReception != null) {
-//                    mReception.append(new String(buffer, 0, size));
-//                }
-//            }
-//        });
+
     }
 
     //将实际指令填充到mBaseCommandBuffer里面
@@ -130,7 +144,6 @@ public class UartDataManagement {
             e.printStackTrace();
             return;
         }
-
     }
 
     //serial port sending thread
