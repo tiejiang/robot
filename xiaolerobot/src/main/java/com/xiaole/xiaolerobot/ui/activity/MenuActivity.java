@@ -46,6 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
+import static android.R.id.message;
 import static com.xiaole.xiaolerobot.util.DemoUtils.getRandomInt;
 import static com.xiaole.xiaolerobot.util.serialportdatamanagement.UartDataManagement.mDataSendHandler;
 import static com.yuntongxun.ecsdk.core.ea.a.v;
@@ -679,6 +680,7 @@ public class MenuActivity extends
             Log.d(Constant.TAG, "command is invalid");
             return;
         }
+        //底盘控制指令解析
         if (controlCommand.equals(Constant.H3_XIAOLE_FORWARD)){
             Log.d("TIEJIANG", "MenuActivity---send to MCU---forward");
 //            mUartManagement.sendCommand(mUartManagement.fillCommand(Constant.H3ControlForward));
@@ -695,7 +697,19 @@ public class MenuActivity extends
 //            mUartManagement.sendCommand(mUartManagement.fillCommand(Constant.H3ControlBodyToRight));
             mDataSendHandler.obtainMessage(0, fillCommand(Constant.H3ControlBodyToRight)).sendToTarget();
             Log.d("TIEJIANG", "MenuActivity---send to MCU---turn_right");
-        }else if (controlCommand.equals(Constant.HAND_SHAKE)){  //握手信号
+        }
+        //头部控制指令解析
+        if (controlCommand.equals(Constant.H3_TURN_HEAD_UP)){
+            mDataSendHandler.obtainMessage(0, fillCommand(Constant.H3ControlHeadToLookUp)).sendToTarget();
+        }else if (controlCommand.equals(Constant.H3_TURN_HEAD_DOWN)){
+            mDataSendHandler.obtainMessage(0, fillCommand(Constant.H3ControlHeadToLookDown)).sendToTarget();
+        }else if (controlCommand.equals(Constant.H3_TURN_HEAD_LEFT)){
+            mDataSendHandler.obtainMessage(0, fillCommand(Constant.H3ControlHeadToLeft)).sendToTarget();
+        }else if (controlCommand.equals(Constant.H3_TURN_HEAD_RIGHT)){
+            mDataSendHandler.obtainMessage(0, fillCommand(Constant.H3ControlHeadToRight)).sendToTarget();
+        }
+        //握手信号解析
+        if (controlCommand.equals(Constant.HAND_SHAKE)){
             handleSendTextMessage(Constant.HAND_OK);
             Log.d("TIEJIANG", "MenuActivity---send to mobile---handed");
         }

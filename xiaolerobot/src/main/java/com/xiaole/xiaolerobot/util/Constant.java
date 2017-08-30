@@ -31,11 +31,17 @@ public class Constant {
     public static final String HAND_SHAKE = "YTXHandshake";
     public static final String HAND_OK = "handed";
 
-    //移动端发送到小乐的控制指令
+    //移动端发送到小乐的控制指令－底盘控制
     public static final String H3_XIAOLE_FORWARD = "mobile_forward";
     public static final String H3_XIAOLE_BACK = "mobile_back";
     public static final String H3_XIAOLE_LEFT = "mobile_turn_left";
     public static final String H3_XIAOLE_RIGHT = "mobile_turn_right";
+
+    //移动端发送到小乐的控制指令－头部控制
+    public static final String H3_TURN_HEAD_UP = "mobile_turn_up";
+    public static final String H3_TURN_HEAD_DOWN = "mobile_turn_down";
+    public static final String H3_TURN_HEAD_LEFT = "mobile_turn_head_left";
+    public static final String H3_TURN_HEAD_RIGHT = "mobile_turn_head_right";
 
     //广佳ＡＰＰ发送的广播指令
     public static final int XIAOLE_FORWARD = 10;
