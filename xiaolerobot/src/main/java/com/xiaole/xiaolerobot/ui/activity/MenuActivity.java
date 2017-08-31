@@ -113,6 +113,7 @@ public class MenuActivity extends
 //        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_menu);
         mMenuActivityContext = this;
+        dealSystemRunTimeMission();  //启动后即开始ｓｄｃａｒｄ媒体搜索
         //check and copy database to the dir
 //        new DatabaseCreate(this).createDb();
         //refresh the database
@@ -121,7 +122,6 @@ public class MenuActivity extends
         // bind service
         Intent bindServiceIntent = new Intent(this, MusicService.class);
         bindService(bindServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
-
 
         new Thread(new UDPRunnable()).start();
 
@@ -188,7 +188,7 @@ public class MenuActivity extends
         uart_test.setOnClickListener(this);
         //start search sdcard source thread
         new Thread(new mMediaSearchThread()).start();
-        dealSystemRunTimeMission();
+
         //start uart/serialport thread
 //        if (mSerialPort != null) {
 //            mSendingThread = new SendingThread();
