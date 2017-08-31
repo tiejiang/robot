@@ -96,8 +96,8 @@ public class MenuActivity extends
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            musicPlayBinder = (MusicService.MusicPlayBinder)iBinder;
 
+            musicPlayBinder = (MusicService.MusicPlayBinder)iBinder;
         }
 
         @Override
@@ -113,15 +113,11 @@ public class MenuActivity extends
 //        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_menu);
         mMenuActivityContext = this;
-        dealSystemRunTimeMission();  //启动后即开始ｓｄｃａｒｄ媒体搜索
+
         //check and copy database to the dir
 //        new DatabaseCreate(this).createDb();
         //refresh the database
         //~~~
-
-        // bind service
-        Intent bindServiceIntent = new Intent(this, MusicService.class);
-        bindService(bindServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 
         new Thread(new UDPRunnable()).start();
 
@@ -186,6 +182,16 @@ public class MenuActivity extends
 //        registerReceiver(mLexinApplicationReceiver, mIntentFilter);
 
         uart_test.setOnClickListener(this);
+
+        // bind service
+//        if(mServiceConnection != null){
+//            unbindService(mServiceConnection);
+//        }
+        Intent bindServiceIntent = new Intent(this, MusicService.class);
+        boolean isBind = bindService(bindServiceIntent, mServiceConnection, this.BIND_AUTO_CREATE);
+        Log.d("TIEJIANG", "MenuActivity---onCreate "+" isBind= "+isBind);
+        dealSystemRunTimeMission();
+        //启动后即开始ｓｄｃａｒｄ媒体搜索（在bindService之后执行，因为bind之后才能够获得service实例去播放音乐）
         //start search sdcard source thread
         new Thread(new mMediaSearchThread()).start();
 
@@ -214,7 +220,9 @@ public class MenuActivity extends
             mWarningToneVector.removeAllElements();
         }
         //unbind service
+        Log.d("TIEJIANG", "MenuActivity---onDestory---unbindService--"+" mServiceConnection= "+mServiceConnection);
         unbindService(mServiceConnection);
+        Log.d("TIEJIANG", "MenuActivity---onDestory---unbindService"+" mServiceConnection= "+mServiceConnection);
     }
 
     @Override
@@ -277,8 +285,8 @@ public class MenuActivity extends
                     case Constant.SEARCH_MEDIASOURCE_COMPLETED_FROM_SDCARD:
                         String musicPath = (String) myMediaList.get(10).get("musicFileUrl");
                         Log.d(Constant.TAG, "musicPath= " + musicPath);
+                        Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + " musicPlayBinder= " + musicPlayBinder);
                         musicPlayBinder.playStateMusic(musicPath);
-//                        new StateMusicMediaPlayer(musicPath).playStateMusic();
                         //when the sdcard media source is loaded then to get the detail data
                         getDancingSongList(myMediaList);
                         getWarningToneList(myMediaList);
@@ -357,7 +365,10 @@ public class MenuActivity extends
         }
         for (int i=0; i<arrayList.size(); i++){
             tempUrlString = (String)arrayList.get(i).get("musicFileUrl");
+            Log.d("TIEJIANG", "MenuActivity---getDancingSongList" + " tempUrlString= " + tempUrlString);
             if (tempUrlString.contains("dancingSong")){
+//                Log.d("TIEJIANG", "MenuActivity---getDancingSongList" + " tempUrlString－－－dancingSong= " + tempUrlString);
+
                 mDanceVector.add(tempUrlString);
 
             }

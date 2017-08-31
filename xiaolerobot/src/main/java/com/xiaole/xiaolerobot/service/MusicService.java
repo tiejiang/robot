@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.xiaole.xiaolerobot.util.Constant;
 
@@ -24,7 +25,7 @@ public class MusicService extends Service{
 
     @Override
     public IBinder onBind(Intent intent) {
-//        Log.d("TIEJIANG", "MusicService---onBind");
+        Log.d("TIEJIANG", "MusicService---onBind"+" mMusicPlayBinder= "+mMusicPlayBinder);
 
         return mMusicPlayBinder;
     }
@@ -61,13 +62,20 @@ public class MusicService extends Service{
 
         public void playStateMusic(String music_url){
 
+//            Log.d("TIEJIANG", "MusicService---MusicPlayBinder" + " mStateMediaPlayer= " + mStateMediaPlayer);
             try{
                 mStateMediaPlayer.setDataSource(music_url);
                 mStateMediaPlayer.prepare();
             }catch (Exception e){
                 e.printStackTrace();
             }
-            mStateMediaPlayer.start();
+            mStateMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mediaPlayer) {
+                    mStateMediaPlayer.start();
+                }
+            });
+
             mStateMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
@@ -86,7 +94,13 @@ public class MusicService extends Service{
             }catch (Exception e){
                 e.printStackTrace();
             }
-            mDanceMediaPlayer.start();
+            mDanceMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mediaPlayer) {
+                    mDanceMediaPlayer.start();
+                }
+            });
+
             mDanceMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {

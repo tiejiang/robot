@@ -75,6 +75,7 @@
         //音乐播放的ｓｅｒｖｉｃｅ
         <service
             android:name="com.xiaole.xiaolerobot.service.MusicService"
+            android:enabled="true"
             />
 
 
