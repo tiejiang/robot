@@ -29,7 +29,7 @@ public class Constant {
 
     //移动端通过云通讯ＩＭ发来的握手信号
     public static final String HAND_SHAKE = "YTXHandshake";
-    public static final String HAND_OK = "handed";
+    public static final String HAND_OK = "YTXHanded";
 
     //移动端发送到小乐的控制指令－底盘控制
     public static final String H3_XIAOLE_FORWARD = "mobile_forward";
@@ -52,6 +52,9 @@ public class Constant {
     public static final int XIAOLE_DOWN = 60;
     public static final int XIAOLE_DANCE_BEGIN = 70;
     public static final int XIAOLE_DANCE_MUSIC_END = 80;
+    public static final String CONNECT_NET = "connect_net"; //开始联网
+    public static final String CONNECT_NET_END = "connect_net_ok";//结束联网
+
 
 
     //向下位机发送的指令集

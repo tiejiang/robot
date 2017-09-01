@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.SystemClock;
 import android.text.format.Formatter;
 import android.util.Log;
 import android.view.View;
@@ -42,6 +43,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -90,6 +92,7 @@ public class MenuActivity extends
     private Vector mDanceVector = new Vector();
     private Vector mWarningToneVector = new Vector();
     private ArrayList<HashMap<String, Object>> myMediaList = new ArrayList<HashMap<String, Object>>();
+    private boolean isGuangJiaAPPConnectNetBegin = false;  //广佳ＡＰＰ是否处于联网模式
     //处理系统运行状态　和　语音转写指令　的Handler
     public static Handler mStateManagementHandler;
     private MusicService.MusicPlayBinder musicPlayBinder;
@@ -112,8 +115,11 @@ public class MenuActivity extends
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 //        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_menu);
+        //bind service
+        Intent bindServiceIntent = new Intent(this, MusicService.class);
+        boolean isBind = bindService(bindServiceIntent, mServiceConnection, this.BIND_AUTO_CREATE);
+        Log.d("TIEJIANG", "MenuActivity---onCreate "+" isBind= "+isBind);
         mMenuActivityContext = this;
-
         //check and copy database to the dir
 //        new DatabaseCreate(this).createDb();
         //refresh the database
@@ -183,13 +189,6 @@ public class MenuActivity extends
 
         uart_test.setOnClickListener(this);
 
-        // bind service
-//        if(mServiceConnection != null){
-//            unbindService(mServiceConnection);
-//        }
-        Intent bindServiceIntent = new Intent(this, MusicService.class);
-        boolean isBind = bindService(bindServiceIntent, mServiceConnection, this.BIND_AUTO_CREATE);
-        Log.d("TIEJIANG", "MenuActivity---onCreate "+" isBind= "+isBind);
         dealSystemRunTimeMission();
         //启动后即开始ｓｄｃａｒｄ媒体搜索（在bindService之后执行，因为bind之后才能够获得service实例去播放音乐）
         //start search sdcard source thread
@@ -203,6 +202,19 @@ public class MenuActivity extends
 
         // for test/debug
 //        closePort();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Date   startDate   =   new Date(System.currentTimeMillis());
+                while (musicPlayBinder == null){
+
+                }
+                Date endDate = new Date(System.currentTimeMillis());
+                long time = endDate.getTime() - startDate.getTime();
+                Log.d("TIEJIANG", "WHILE musicPlayerBinder == null"+" time= "+time);
+                musicPlayBinder.playStateMusic("hello_waiting_for_you.mp3");
+            }
+        }).start();
 
     }
 
@@ -220,9 +232,7 @@ public class MenuActivity extends
             mWarningToneVector.removeAllElements();
         }
         //unbind service
-        Log.d("TIEJIANG", "MenuActivity---onDestory---unbindService--"+" mServiceConnection= "+mServiceConnection);
         unbindService(mServiceConnection);
-        Log.d("TIEJIANG", "MenuActivity---onDestory---unbindService"+" mServiceConnection= "+mServiceConnection);
     }
 
     @Override
@@ -266,7 +276,7 @@ public class MenuActivity extends
     }
 
     /**
-     * function: deal the system runtime mission
+     * function: deal the system runtime missions
      *
      * */
     public void dealSystemRunTimeMission(){
@@ -276,6 +286,7 @@ public class MenuActivity extends
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
+                String message = (String)msg.obj;
                 switch (msg.what){
                     //开机广播收到后，不能立即从ｓｄｃａｒｄ当中读取媒体内容播放，因为此时的ｓｄｃａｒｄ内容尚未读出
                     case Constant.BOOT_COMPLETED_FROM_BROADCASTRECEIVER:
@@ -284,9 +295,9 @@ public class MenuActivity extends
                     //ｓｄｃａｒｄ卡媒体内容加载完毕（才能进行所有媒体库内容播放）
                     case Constant.SEARCH_MEDIASOURCE_COMPLETED_FROM_SDCARD:
                         String musicPath = (String) myMediaList.get(10).get("musicFileUrl");
-                        Log.d(Constant.TAG, "musicPath= " + musicPath);
-                        Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + " musicPlayBinder= " + musicPlayBinder);
-                        musicPlayBinder.playStateMusic(musicPath);
+                        Log.d("TIEJIANG", "musicPath= " + musicPath);
+                        Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + " sdcard over musicPlayBinder= " + musicPlayBinder);
+//                        musicPlayBinder.playStateMusic(musicPath); //此处会概率性出现musicPlayBinder为空的情况，尚未找到原因
                         //when the sdcard media source is loaded then to get the detail data
                         getDancingSongList(myMediaList);
                         getWarningToneList(myMediaList);
@@ -296,39 +307,21 @@ public class MenuActivity extends
                         //从语音解析到跳舞指令后开始音乐播放（get the random song from vector）
                         int mDancingSongNum = getRandomInt(mDanceVector.size());
                         String musicUrl = (String)mDanceVector.get(mDancingSongNum);
-                        Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + " musicUrl= " + musicUrl);
+                        Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + " musicUrl= " + musicUrl+" \n musicPlayBinder= "+musicPlayBinder);
                         musicPlayBinder.playDanceMusic(musicUrl);
 
                         break;
                     case Constant.XIAOLE_DANCE_MUSIC_END:
+//                        mDataSendHandler.obtainMessage(0, mUartManagement.fillCommand(Constant.bodyStop)).sendToTarget();
                         mDataSendHandler.obtainMessage(0, mUartManagement.fillCommand(Constant.headToMiddle)).sendToTarget();
-                        mDataSendHandler.obtainMessage(0, mUartManagement.fillCommand(Constant.bodyStop)).sendToTarget();
                         break;
-//                case Constant.XIAOLE_LEFT:
-//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.turnLeft)).sendToTarget();
-//                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
-//                    break;
-//                case Constant.XIAOLE_RIGHT:
-//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.turnRight)).sendToTarget();
-//                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
-//                    break;
-//                case Constant.XIAOLE_UP:
-//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.lookUp)).sendToTarget();
-//                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
-//                    break;
-//                case Constant.XIAOLE_DOWN:
-//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.lookDown)).sendToTarget();
-//                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
-//                    break;
-//                case Constant.XIAOLE_DANCE:
-//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.danceModeOne)).sendToTarget();
-//                    Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + "forward command send to MCU");
-//                    break;
-//
-//                default: //默认身体回复初始位置
-//                    mDataSendHandler.obtainMessage(0, fillCommand(Constant.bodyStop)).sendToTarget();
-//                    break;
 
+                }
+                // judge guangjia app is start to connect net or not
+                if (message.equals(Constant.CONNECT_NET)){
+                    isGuangJiaAPPConnectNetBegin = true;
+                }else if (message.equals(Constant.CONNECT_NET_END)){
+                    isGuangJiaAPPConnectNetBegin = false;
                 }
             }
         };
@@ -446,7 +439,7 @@ public class MenuActivity extends
 
                     jsonSignal = analysisJSONData(str_receive);
                     if (jsonSignal == 2){
-                        String handShakeSend = handleJSON("handed", currentIP());
+                        String handShakeSend = handleJSON("local_handed", currentIP());
                         dp_send = new DatagramPacket(handShakeSend.getBytes(),handShakeSend.length(),dp_receive.getAddress(),21240);
                     }else if(jsonSignal == 1) {
                         String xiaoleSetting = handleJSON("IDSetted", currentIP());
@@ -492,12 +485,14 @@ public class MenuActivity extends
 
     /**
      * return :
-     *  true : YTX ID setted
-     *  false : handed with mobile side
-     *  0: nothing
-     *  1:YTX ID setted
-     *  2:handed with mobile side
-     *  3:local control command from mobile side
+     * old version:
+     *      true : YTX ID setted
+     *      false : handed with mobile side
+     * now new version:
+     *      0: nothing
+     *      1:YTX ID setted
+     *      2:handed with mobile side
+     *      3:local control command from mobile side
      * */
     public int analysisJSONData(String json_string){
 
@@ -719,7 +714,7 @@ public class MenuActivity extends
         }else if (controlCommand.equals(Constant.H3_TURN_HEAD_RIGHT)){
             mDataSendHandler.obtainMessage(0, fillCommand(Constant.H3ControlHeadToRight)).sendToTarget();
         }
-        //握手信号解析
+        //握手信号解析　//  && !isGuangJiaAPPConnectNetBegin
         if (controlCommand.equals(Constant.HAND_SHAKE)){
             handleSendTextMessage(Constant.HAND_OK);
             Log.d("TIEJIANG", "MenuActivity---send to mobile---handed");
