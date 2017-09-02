@@ -55,7 +55,40 @@ public class Constant {
     public static final String CONNECT_NET = "connect_net"; //开始联网
     public static final String CONNECT_NET_END = "connect_net_ok";//结束联网
 
+    //开机音乐　状态音乐/提示音
+    public static String[] POWER_ON_MUSIC =
+            {
+                    "hello_waiting_for_you",
+                    "xiaole_get_up",
+                    "boring_play_with_me",
+                    "xiaole_is_starting",
+                    "hello_master"
+            };
 
+    //运行提示音乐-没有交互的时候播放(暂不使用－－－目前无法获得广佳的交互回调)
+    public static String[] RUNTIME_STATE_MUSIC =
+            {
+                    "i_will_be_have_a_rest",
+                    "listen_to_my_story",
+                    "lets_sing_together",
+                    "master_i_was_behaved",
+                    "master_lets_learning"
+            };
+
+    //摸屁股提示音
+    public static String[] TOUCH_HIP_MUSIC =
+            {
+                    "dont_touch_hips"
+            };
+
+    //充电相关提示
+    public static String[] BATTERY_CHARGING_MUSIC =
+            {
+                    "low_battery_charging_soon",
+                    "charging_over",
+                    "begin_charging",
+                    "charging_me_soon_or_i_will_die"
+            };
 
     //向下位机发送的指令集
     public static byte[] forward = {(byte) 0x00, (byte) 0x01};

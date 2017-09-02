@@ -28,6 +28,7 @@ import com.xiaole.xiaolerobot.service.MusicService;
 import com.xiaole.xiaolerobot.ui.helper.IMChattingHelper;
 import com.xiaole.xiaolerobot.ui.helper.SDKCoreHelper;
 import com.xiaole.xiaolerobot.util.Constant;
+import com.xiaole.xiaolerobot.util.DemoUtils;
 import com.xiaole.xiaolerobot.util.mediaplay.StateMusicMediaPlayer;
 import com.xiaole.xiaolerobot.util.serialportdatamanagement.UartDataManagement;
 import com.yuntongxun.ecsdk.ECError;
@@ -163,19 +164,21 @@ public class MenuActivity extends
         mButtonRobotDistribute = (Button)findViewById(R.id.btn_remote_control);
         mButtonDisplay = (Button)findViewById(R.id.btn_audio);
         uart_test = (Button)findViewById(R.id.uart_test);
-//        test = (Button)findViewById(R.id.test);
+        test = (Button)findViewById(R.id.test);
 
-        //使用应用内广播测试应用间广播是否能够收到
-//        test.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                //发送广播
-//                String broadcastIntent = "ACTION_LEXIN_TO_YINYU";
-//                Intent intent = new Intent(broadcastIntent);
-//                intent.putExtra("MESSAGE", "turn_left");
-//                MenuActivity.this.sendBroadcast(intent);
-//            }
-//        });
+        //test code begin 使用应用内广播测试应用间广播是否能够收到
+        test.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //发送广播
+//                String broadcastIntent = "ACTION_LEXIN_TO_YINYU"; //小乐ＡＰＰ收
+                String broadcastIntent = "ACTION_YINYU_TO_LEXIN";    //广佳ＡＰＰ收
+                Intent intent = new Intent(broadcastIntent);
+                intent.putExtra("MESSAGE", "test_broadcast");
+                MenuActivity.this.sendBroadcast(intent);
+            }
+        });
+        //test code end
 
         mButtonMonitor.setOnClickListener(this);
         mButtonRobotDistribute.setOnClickListener(this);
@@ -205,14 +208,14 @@ public class MenuActivity extends
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Date   startDate   =   new Date(System.currentTimeMillis());
+//                Date   startDate   =   new Date(System.currentTimeMillis());
                 while (musicPlayBinder == null){
 
                 }
-                Date endDate = new Date(System.currentTimeMillis());
-                long time = endDate.getTime() - startDate.getTime();
-                Log.d("TIEJIANG", "WHILE musicPlayerBinder == null"+" time= "+time);
-                musicPlayBinder.playStateMusic("hello_waiting_for_you.mp3");
+//                Date endDate = new Date(System.currentTimeMillis());
+//                long time = endDate.getTime() - startDate.getTime();
+//                Log.d("TIEJIANG", "WHILE musicPlayerBinder == null"+" time= "+time);
+                musicPlayBinder.playStateMusic(selectStateMusic(Constant.POWER_ON_MUSIC));
             }
         }).start();
 
@@ -274,6 +277,24 @@ public class MenuActivity extends
 
         }
     }
+
+    /**
+     * function: select music in the array
+     * @return String: the music name
+     * */
+    private String selectStateMusic(String[] music_array){
+
+        String[] tempString = music_array;
+        int musicIndex = 0;
+        if (tempString.length < 1){
+            return null;
+        }
+        musicIndex = tempString.length;
+        int random = DemoUtils.getRandomInt(musicIndex);
+        return tempString[random];
+
+    }
+
 
     /**
      * function: deal the system runtime missions

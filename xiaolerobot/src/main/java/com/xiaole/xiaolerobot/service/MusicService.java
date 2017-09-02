@@ -50,12 +50,13 @@ public class MusicService extends Service{
 //            Log.d("TIEJIANG", "MusicService---MusicPlayBinder" + " mStateMediaPlayer= " + mStateMediaPlayer);
             try{
                 mStateMediaPlayer = new MediaPlayer();
-                if (music_url.contains("hello_waiting_for_you")){   //开机后ＡＰＰ启动音乐
-                    AssetFileDescriptor fd = getAssets().openFd("hello_waiting_for_you.mp3");
+//                if (music_url.contains("hello_waiting_for_you")){   //开机后ＡＰＰ启动音乐
+                    AssetFileDescriptor fd = getAssets().openFd(music_url+".mp3");
                     mStateMediaPlayer.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
-                }else {                     //其他状态的音乐
-                    mStateMediaPlayer.setDataSource(music_url);
-                }
+//                }
+//                else {                     //其他状态的音乐
+//                    mStateMediaPlayer.setDataSource(music_url);
+//                }
                 mStateMediaPlayer.prepare();
             }catch (Exception e){
                 e.printStackTrace();

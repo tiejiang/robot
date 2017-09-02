@@ -55,7 +55,7 @@ public class DemoUtils {
 
 
 	/**
-	 * 获取一个０到制定值之间的随机数
+	 * 获取一个０到指定值之间的随机数
 	 * */
 	public static int getRandomInt(int random){
 		int a = new Random().nextInt(random);
