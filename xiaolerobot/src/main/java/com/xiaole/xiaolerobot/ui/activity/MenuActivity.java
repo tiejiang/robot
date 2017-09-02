@@ -93,7 +93,7 @@ public class MenuActivity extends
     private Vector mDanceVector = new Vector();
     private Vector mWarningToneVector = new Vector();
     private ArrayList<HashMap<String, Object>> myMediaList = new ArrayList<HashMap<String, Object>>();
-    private boolean isGuangJiaAPPConnectNetBegin = false;  //广佳ＡＰＰ是否处于联网模式
+//    private boolean isGuangJiaAPPConnectNetBegin = false;  //广佳ＡＰＰ是否处于联网模式
     //处理系统运行状态　和　语音转写指令　的Handler
     public static Handler mStateManagementHandler;
     private MusicService.MusicPlayBinder musicPlayBinder;
@@ -339,11 +339,11 @@ public class MenuActivity extends
 
                 }
                 // judge guangjia app is start to connect net or not
-                if (message.equals(Constant.CONNECT_NET)){
-                    isGuangJiaAPPConnectNetBegin = true;
-                }else if (message.equals(Constant.CONNECT_NET_END)){
-                    isGuangJiaAPPConnectNetBegin = false;
-                }
+//                if (message.equals(Constant.CONNECT_NET)){
+//                    isGuangJiaAPPConnectNetBegin = true;
+//                }else if (message.equals(Constant.CONNECT_NET_END)){
+//                    isGuangJiaAPPConnectNetBegin = false;
+//                }
             }
         };
     }

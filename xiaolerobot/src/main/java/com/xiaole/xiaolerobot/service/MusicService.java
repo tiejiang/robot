@@ -61,6 +61,7 @@ public class MusicService extends Service{
             }catch (Exception e){
                 e.printStackTrace();
             }
+//            mStateMediaPlayer.start();
             mStateMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mediaPlayer) {
@@ -87,11 +88,15 @@ public class MusicService extends Service{
                 mDanceMediaPlayer.prepare();
             }catch (Exception e){
                 e.printStackTrace();
+                Log.d("TIEJIANG", "playDanceMusic---PLAY---EXCEPTION");
             }
+            Log.d("TIEJIANG", "playDanceMusic---PLAY");
+//            mDanceMediaPlayer.start();
             mDanceMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mediaPlayer) {
                     mDanceMediaPlayer.start();
+                    Log.d("TIEJIANG", "playDanceMusic---PLAY---PREPARED");
                 }
             });
 
