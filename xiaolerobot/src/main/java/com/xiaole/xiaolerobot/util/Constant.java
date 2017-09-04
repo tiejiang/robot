@@ -31,6 +31,9 @@ public class Constant {
     public static final String HAND_SHAKE = "YTXHandshake";
     public static final String HAND_OK = "YTXHanded";
 
+    //移动端通过云通讯ＩＭ发来的拍照信号
+    public static final String TAKE_PHOTO = "take_photo";
+
     //移动端发送到小乐的控制指令－底盘控制
     public static final String H3_XIAOLE_FORWARD = "mobile_forward";
     public static final String H3_XIAOLE_BACK = "mobile_back";
@@ -54,6 +57,13 @@ public class Constant {
     public static final int XIAOLE_DANCE_MUSIC_END = 80;
     public static final String CONNECT_NET = "connect_net"; //开始联网
     public static final String CONNECT_NET_END = "connect_net_ok";//结束联网
+
+    //小乐ＡＰＰ发广佳的广播
+    public static final String LEXING_ACTION = "ACTION_YINYU_TO_LEXIN";
+    public static final String PHOTO_TAKE = "photo_take";
+
+    //通过MenuActivity启动拍照Activity的回调识别码
+    public static final int REQUEST_CODE_PHOTO_TAKE = 0;
 
     //开机音乐　状态音乐/提示音
     public static String[] POWER_ON_MUSIC =

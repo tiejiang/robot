@@ -62,7 +62,7 @@ import static com.yuntongxun.ecsdk.core.setup.h.m;
 public class MenuActivity extends
 //        SerialPortActivity
         Activity
-        implements IMChattingHelper.OnMessageReportCallback, View.OnClickListener {
+        implements IMChattingHelper.OnMessageReportCallback, View.OnClickListener{
 
 //    public static final String TAG
     private Button mButtonMonitor;
@@ -172,7 +172,7 @@ public class MenuActivity extends
             public void onClick(View view) {
                 //发送广播
 //                String broadcastIntent = "ACTION_LEXIN_TO_YINYU"; //小乐ＡＰＰ收
-                String broadcastIntent = "ACTION_YINYU_TO_LEXIN";    //广佳ＡＰＰ收
+                String broadcastIntent = Constant.LEXING_ACTION;    //广佳ＡＰＰ收
                 Intent intent = new Intent(broadcastIntent);
                 intent.putExtra("MESSAGE", "test_broadcast");
                 MenuActivity.this.sendBroadcast(intent);
@@ -243,8 +243,8 @@ public class MenuActivity extends
         super.onResume();
         IMChattingHelper.setOnMessageReportCallback(this);
         //视频结束后让应用退到后台
-        boolean movetoback = moveTaskToBack(true);
-        Log.d("TIEJIANG", "whether activity goto back or moved = " + movetoback);
+//        boolean movetoback = moveTaskToBack(true);
+//        Log.d("TIEJIANG", "whether activity goto back or moved = " + movetoback);
     }
 
     @Override
@@ -276,6 +276,18 @@ public class MenuActivity extends
                 break;
 
         }
+    }
+
+    /**
+     * function: when received command from mobile side,
+     * MenuActivity start MyCameraActivity to take photo,
+     * and when the photo is taked and saved to system folder,
+     * this method will be called to get the photo url and other
+     * messages.
+     * */
+    public void onPhotoTakeAndSave() {
+
+        Log.d("TIEJIANG", "MenuActivity---onPhotoTakeAndSaved");
     }
 
     /**
@@ -543,7 +555,7 @@ public class MenuActivity extends
                 jsonResult = 2;
             }else if(wanted.equals("sendLocalControlCommand") && name.equals("XiaoleClient") && hostip != null){
                 jsonResult = 3;
-                //解析并通过串口向下发送指令
+                //解析指令（并通过串口向下发送）
                 analysisCommand(clientContent);
             }
         }catch (JSONException e){
@@ -740,6 +752,32 @@ public class MenuActivity extends
             handleSendTextMessage(Constant.HAND_OK);
             Log.d("TIEJIANG", "MenuActivity---send to mobile---handed");
         }
+        //解析移动端拍照指令（通过云通讯IM发送）
+        if (controlCommand.equals(Constant.TAKE_PHOTO)){
+
+            Log.d("TIEJIANG", "MenuActivity---analysisCommand　take photo");
+            String broadcastIntent = Constant.LEXING_ACTION;    //广佳ＡＰＰ收
+            Intent intent = new Intent(broadcastIntent);
+            intent.putExtra("MESSAGE", Constant.PHOTO_TAKE);
+            MenuActivity.this.sendBroadcast(intent);
+
+        }
+    }
+
+
+    /**
+     * callbacke for MyCameraActivity
+     * not used now !!!
+     * instead of onActivityResult method
+     * */
+    public void getPhotoCallback(){
+
+//        InstanceHelper.mMyCameraActivity.isSavedPhotos(new TakePhotoAndSave() {
+//            @Override
+//            public void onPhotoTakeAndSave(String photo_url) {
+//                Log.d("TIEJIANG", "MenuActivity---getPhotoCallback");
+//            }
+//        });
     }
 
 
@@ -759,7 +797,6 @@ public class MenuActivity extends
         Log.d("TIEJIANG", "[MenuActivity-onPushMessage]" + ",sessionId :" + sessionId);// add by tiejiang
         //for test
 //        handleSendTextMessage(message + "callback");
-
         analysisCommand(message);
     }
 
