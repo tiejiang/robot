@@ -31,6 +31,7 @@ import com.xiaole.xiaolerobot.util.Constant;
 import com.xiaole.xiaolerobot.util.DemoUtils;
 import com.xiaole.xiaolerobot.util.mediaplay.StateMusicMediaPlayer;
 import com.xiaole.xiaolerobot.util.serialportdatamanagement.UartDataManagement;
+import com.yuntongxun.ecsdk.ECDevice;
 import com.yuntongxun.ecsdk.ECError;
 import com.yuntongxun.ecsdk.ECInitParams;
 import com.yuntongxun.ecsdk.ECMessage;
@@ -50,6 +51,7 @@ import java.util.List;
 import java.util.Vector;
 
 import static android.R.id.message;
+import static com.xiaole.xiaolerobot.ui.helper.SDKCoreHelper.logout;
 import static com.xiaole.xiaolerobot.util.DemoUtils.getRandomInt;
 import static com.xiaole.xiaolerobot.util.serialportdatamanagement.UartDataManagement.mDataSendHandler;
 import static com.yuntongxun.ecsdk.core.ea.a.v;
@@ -139,6 +141,8 @@ public class MenuActivity extends
             contactID = ytxID[0];
             Log.d("TIEJIANG", "MenuActivity---onCreat contactID= " + ytxID[0]);
         }
+
+//        IMChattingHelper.setOnMessageReportCallback(this);
         //若收到ＩＤ不同，则重新初始化云通讯
 //        mYTXInitHandler = new Handler(){
 //            @Override
@@ -219,6 +223,18 @@ public class MenuActivity extends
             }
         }).start();
 
+        //test code
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try{
+//                    Thread.sleep(5000);
+//                    restartXiaoleApp();
+//                }catch (InterruptedException e){
+//
+//                }
+//            }
+//        }).start();
     }
 
     @Override
@@ -241,7 +257,7 @@ public class MenuActivity extends
     @Override
     protected void onResume() {
         super.onResume();
-        IMChattingHelper.setOnMessageReportCallback(this);
+//        IMChattingHelper.setOnMessageReportCallback(this);
         //视频结束后让应用退到后台
 //        boolean movetoback = moveTaskToBack(true);
 //        Log.d("TIEJIANG", "whether activity goto back or moved = " + movetoback);
@@ -583,6 +599,7 @@ public class MenuActivity extends
 
         boolean isSaved = false;
         String[] id = getYTXID();
+        final String YTXH3ID = ytx_id[1];
         Log.d("TIEJIANG", " MenuActivity---saveYTXID id[0]= " + id[0] + ", id[1]= " + id[1]);
         //没有存储　或者　之前有存储，但是（由于移动端重新安装了ＡＰＰ导致重新生成了ＩＤ）和Ｈ３平台不一致，也要重新存储
         if ((id[0].equals("0") && id[1].equals("1")) || (id[0].length() > 5 && !id[0].equals(ytx_id[0]))){
@@ -595,11 +612,33 @@ public class MenuActivity extends
         }
         Log.d("TIEJIANG", " MenuActivity---saveYTXID isSaved= " + isSaved);
         if (isSaved){
-            //存储成功，并初始化云通讯
-            initYTX(ytx_id[1]);
+            //注销当前登录
+            logout(false);
+            ECDevice.logout(new ECDevice.OnLogoutListener() {
+                @Override
+                public void onLogout() {
+                    Log.d("TIEJIANG", " MenuActivity---saveYTXID old id logout");
+                    //存储成功且旧的ＩＤ已经退出，初始化和登录新的云通讯ＩＤ
+                    initYTX(YTXH3ID);
+                }
+            });
+            //重新启动ＡＰＰ使新的登录id生效 重新启动之后，在onCreat里面重新初始化云通讯
+//            restartXiaoleApp();
             Log.d("TIEJIANG", " MenuActivity---saveYTXID isSaved= " + isSaved + "　initYTX()");
 //            mYTXInitHandler.obtainMessage(1, ytx_id).sendToTarget();
         }
+    }
+
+    /**
+     * function: restart xiaole app to refresh YTX new ID
+     * make the new YTX ID works
+     * */
+    public void restartXiaoleApp(){
+
+        final Intent intent = getBaseContext().getPackageManager().getLaunchIntentForPackage(getPackageName());
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        Log.d("TIEJIANG", " MenuActivity---restartXiaoleApp");
     }
 
     //接受乐新smart应用的广播--->已修改为单独一个类的静态广播
