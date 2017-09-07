@@ -13,6 +13,7 @@
 package com.xiaole.xiaolerobot.ui.helper;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.xiaole.xiaolerobot.common.CCPAppManager;
 import com.xiaole.xiaolerobot.core.ClientUser;
@@ -144,10 +145,11 @@ public class IMChattingHelper implements OnChatReceiveListener,
 					public void onSendMessageComplete(ECError error, ECMessage message) {
 						// 处理消息发送结果
 						if(message == null) {
+							Log.d("TIEJIANG", "[IMChattingHelper]-SEND SUCCEED");
+
 							return ;
 						}
 						// 将发送的消息更新到本地数据库并刷新UI
-//						Log.d("TIEJIANG", "[IMChattingHelper]-ECError code = " + error.toString());// add by tiejiang
 					}
 
 					@Override
@@ -156,7 +158,7 @@ public class IMChattingHelper implements OnChatReceiveListener,
 					}
 				});
 
-				String  message = ((ECTextMessageBody) msg.getBody()).getMessage();
+//				String  message = ((ECTextMessageBody) msg.getBody()).getMessage();
 //				Log.d("TIEJIANG", "[IMChattingHelper]-send message" + ", msg= " + message);// add by tiejiang
 			}
 
@@ -168,7 +170,7 @@ public class IMChattingHelper implements OnChatReceiveListener,
 //			}
 		} else {
 			msg.setMsgStatus(ECMessage.MessageStatus.FAILED);
-//			Log.d("TIEJIANG","[IMChattingHelper]-send message failed");// add by tiejiang
+			Log.d("TIEJIANG","[IMChattingHelper]-send message failed");// add by tiejiang
 		}
 
 //		if(isSelf){

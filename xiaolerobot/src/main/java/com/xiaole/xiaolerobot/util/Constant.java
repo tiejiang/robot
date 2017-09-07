@@ -63,7 +63,10 @@ public class Constant {
     public static final String PHOTO_TAKE = "photo_take";
 
     //通过MenuActivity启动拍照Activity的回调识别码
-    public static final int REQUEST_CODE_PHOTO_TAKE = 0;
+//    public static final int REQUEST_CODE_PHOTO_TAKE = 0;
+
+    public static final int REQUEST_CODE_NULL = 0;
+    public static final int REQUEST_CODE_OK = 1;
 
     //开机音乐　状态音乐/提示音
     public static String[] POWER_ON_MUSIC =

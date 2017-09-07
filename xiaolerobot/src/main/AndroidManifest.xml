@@ -20,6 +20,11 @@
         <activity
             android:name="com.xiaole.xiaolerobot.ui.activity.RemoteControlCommandActivity">
         </activity>
+
+        <activity
+            android:name="com.xiaole.xiaolerobot.camera.MyCameraActivity">
+        </activity>
+
         <activity
             android:name="com.xiaole.xiaolerobot.ui.activity.VoIPCallActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"

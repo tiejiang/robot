@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.xiaole.xiaolerobot.R;
+import com.xiaole.xiaolerobot.camera.MyCameraActivity;
 import com.xiaole.xiaolerobot.common.CCPAppManager;
 import com.xiaole.xiaolerobot.core.ClientUser;
 import com.xiaole.xiaolerobot.service.MusicService;
@@ -36,6 +37,7 @@ import com.yuntongxun.ecsdk.ECError;
 import com.yuntongxun.ecsdk.ECInitParams;
 import com.yuntongxun.ecsdk.ECMessage;
 import com.yuntongxun.ecsdk.ECVoIPCallManager;
+import com.yuntongxun.ecsdk.im.ECImageMessageBody;
 import com.yuntongxun.ecsdk.im.ECTextMessageBody;
 
 import org.json.JSONException;
@@ -54,6 +56,7 @@ import static android.R.id.message;
 import static com.xiaole.xiaolerobot.ui.helper.SDKCoreHelper.logout;
 import static com.xiaole.xiaolerobot.util.DemoUtils.getRandomInt;
 import static com.xiaole.xiaolerobot.util.serialportdatamanagement.UartDataManagement.mDataSendHandler;
+import static com.yuntongxun.ecsdk.core.ea.a.I;
 import static com.yuntongxun.ecsdk.core.ea.a.v;
 import static com.yuntongxun.ecsdk.core.setup.h.m;
 
@@ -610,21 +613,21 @@ public class MenuActivity extends
             mEditor.putString(Constant.H3_ID, ytx_id[1]);
             isSaved = mEditor.commit();
         }
-        Log.d("TIEJIANG", " MenuActivity---saveYTXID isSaved= " + isSaved);
+//        Log.d("TIEJIANG", " MenuActivity---saveYTXID isSaved= " + isSaved);
         if (isSaved){
             //注销当前登录
             logout(false);
             ECDevice.logout(new ECDevice.OnLogoutListener() {
                 @Override
                 public void onLogout() {
-                    Log.d("TIEJIANG", " MenuActivity---saveYTXID old id logout");
+//                    Log.d("TIEJIANG", " MenuActivity---saveYTXID old id logout");
                     //存储成功且旧的ＩＤ已经退出，初始化和登录新的云通讯ＩＤ
                     initYTX(YTXH3ID);
                 }
             });
-            //重新启动ＡＰＰ使新的登录id生效 重新启动之后，在onCreat里面重新初始化云通讯
+            //重新启动ＡＰＰ使新的登录id生效 重新启动之后，在onCreate里面重新初始化云通讯
 //            restartXiaoleApp();
-            Log.d("TIEJIANG", " MenuActivity---saveYTXID isSaved= " + isSaved + "　initYTX()");
+//            Log.d("TIEJIANG", " MenuActivity---saveYTXID isSaved= " + isSaved + "　initYTX()");
 //            mYTXInitHandler.obtainMessage(1, ytx_id).sendToTarget();
         }
     }
@@ -795,14 +798,31 @@ public class MenuActivity extends
         if (controlCommand.equals(Constant.TAKE_PHOTO)){
 
             Log.d("TIEJIANG", "MenuActivity---analysisCommand　take photo");
-            String broadcastIntent = Constant.LEXING_ACTION;    //广佳ＡＰＰ收
-            Intent intent = new Intent(broadcastIntent);
-            intent.putExtra("MESSAGE", Constant.PHOTO_TAKE);
-            MenuActivity.this.sendBroadcast(intent);
+            Intent mIntent = new Intent(this, MyCameraActivity.class);
+            startActivityForResult(mIntent, 0);
+//            String broadcastIntent = Constant.LEXING_ACTION;    //广佳ＡＰＰ收
+//            Intent intent = new Intent(broadcastIntent);
+//            intent.putExtra("MESSAGE", Constant.PHOTO_TAKE);
+//            MenuActivity.this.sendBroadcast(intent);
 
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (resultCode){
+            case 0:
+                String photoUrlTemp = data.getStringExtra("photo_url");
+                Log.d("TIEJIANG", "MenuActivity---onActivityResult"+" photoUrl= "+photoUrlTemp);
+                break;
+            case 1:
+                String photoUrl = data.getStringExtra("photo_url");
+                Log.d("TIEJIANG", "MenuActivity---onActivityResult"+" photoUrl= "+photoUrl);
+                handleSendImageMessage(photoUrl);
+                break;
+        }
+    }
 
     /**
      * callbacke for MyCameraActivity
@@ -854,44 +874,20 @@ public class MenuActivity extends
         if(text == null) {
             return ;
         }
-        if(text.toString().trim().length() <= 0) {
+//        if(text.toString().trim().length() <= 0) {
         //canotSendEmptyMessage();
-            return ;
-        }
+//            return ;
+//        }
         // 组建一个待发送的ECMessage
         ECMessage msg = ECMessage.createECMessage(ECMessage.Type.TXT);
         // 设置消息接收者
         //msg.setTo(mRecipients);
         msg.setTo(contactID); // attenionthis number is not the login number! / modified by tiejiang
         ECTextMessageBody msgBody=null;
-        Boolean isBQMMMessage=false;
-        String emojiNames = null;
-        //if(text.toString().contains(CCPChattingFooter2.TXT_MSGTYPE)&& text.toString().contains(CCPChattingFooter2.MSG_DATA)){
-        //try {
-            //JSONObject jsonObject = new JSONObject(text.toString());
-            //String emojiType=jsonObject.getString(CCPChattingFooter2.TXT_MSGTYPE);
-            //if(emojiType.equals(CCPChattingFooter2.EMOJITYPE) || emojiType.equals(CCPChattingFooter2.FACETYPE)){//说明是含有BQMM的表情
-            //isBQMMMessage=true;
-            //emojiNames=jsonObject.getString(CCPChattingFooter2.EMOJI_TEXT);
-            //}
-        //} catch (JSONException e) {
-        //e.printStackTrace();
-        //}
-        //}
-        if (isBQMMMessage) {
-            msgBody = new ECTextMessageBody(emojiNames);
-            msg.setBody(msgBody);
-            msg.setUserData(text.toString());
-        } else {
             // 创建一个文本消息体，并添加到消息对象中
             msgBody = new ECTextMessageBody(text.toString());
             msg.setBody(msgBody);
             Log.d("TIEJIANG", "[MenuActivity]-handleSendTextMessage" + ", txt = " + text);// add by tiejiang
-        }
-
-            //String[] at = mChattingFooter.getAtSomeBody();
-            //msgBody.setAtMembers(at);
-            //mChattingFooter.clearSomeBody();
         try {
             // 发送消息，该函数见上
             long rowId = -1;
@@ -908,6 +904,60 @@ public class MenuActivity extends
         } catch (Exception e) {
             e.printStackTrace();
             Log.d("TIEJIANG", "[MenuActivity]-send failed");// add by tiejiang
+        }
+    }
+
+    /**
+     * 处理图片发送方法事件通知
+     * @param text
+     */
+    public void handleSendImageMessage(String img_path) {
+        if(img_path == null) {
+            return ;
+        }
+//        if(text.toString().trim().length() <= 0) {
+        //canotSendEmptyMessage();
+//            return ;
+//        }
+        // 组建一个待发送的ECMessage
+        ECMessage msg = ECMessage.createECMessage(ECMessage.Type.IMAGE);
+        // 设置消息接收者
+        //msg.setTo(mRecipients);
+        msg.setTo(contactID); // attenionthis number is not the login number! / modified by tiejiang
+        ECImageMessageBody mECImageMessageBody = null;
+        String imgString = img_path;
+        //send img to mobile side
+        if (imgString != null){
+            mECImageMessageBody = new ECImageMessageBody();
+            String imgFileName = imgString.split("/")[5];
+//            String imgFileExt = imgFileName.split("\\.")[1];
+            String imgFileExt = DemoUtils.getExtensionName(imgFileName);
+            Log.d("TIEJIANG", "[MenuActivity]-handleSendTextMessage"
+                    +", imgString = "+imgString+", imgFileName= "+imgFileName+", imgFileExt= "+imgFileExt);
+            mECImageMessageBody.setFileName(imgFileName);
+            mECImageMessageBody.setFileExt(imgFileExt);
+            mECImageMessageBody.setLocalUrl(imgString);
+            msg.setBody(mECImageMessageBody);
+        }
+        //String[] at = mChattingFooter.getAtSomeBody();
+        //msgBody.setAtMembers(at);
+        //mChattingFooter.clearSomeBody();
+        try {
+            // 发送消息，该函数见上
+            long rowId = -1;
+            //if(mCustomerService) {
+            //rowId = CustomerServiceHelper.sendMCMessage(msg);
+            //} else {
+            Log.d("TIEJIANG", "[MenuActivity]-SendECMessage");
+            rowId = IMChattingHelper.sendECMessage(msg);
+
+            //}
+            // 通知列表刷新
+            //msg.setId(rowId);
+            //notifyIMessageListView(msg);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d("TIEJIANG", "[MenuActivity]-send failed");
         }
     }
 }
