@@ -25,6 +25,7 @@ import com.xiaole.xiaolerobot.R;
 import com.xiaole.xiaolerobot.camera.MyCameraActivity;
 import com.xiaole.xiaolerobot.common.CCPAppManager;
 import com.xiaole.xiaolerobot.core.ClientUser;
+import com.xiaole.xiaolerobot.instancefractory.InstanceHelper;
 import com.xiaole.xiaolerobot.service.MusicService;
 import com.xiaole.xiaolerobot.ui.helper.IMChattingHelper;
 import com.xiaole.xiaolerobot.ui.helper.SDKCoreHelper;
@@ -53,6 +54,7 @@ import java.util.List;
 import java.util.Vector;
 
 import static android.R.id.message;
+import static com.xiaole.xiaolerobot.instancefractory.InstanceHelper.mMenuActivity;
 import static com.xiaole.xiaolerobot.ui.helper.SDKCoreHelper.logout;
 import static com.xiaole.xiaolerobot.util.DemoUtils.getRandomInt;
 import static com.xiaole.xiaolerobot.util.serialportdatamanagement.UartDataManagement.mDataSendHandler;
@@ -87,6 +89,12 @@ public class MenuActivity extends
     String pass = "";
     ECInitParams.LoginAuthType mLoginAuthType = ECInitParams.LoginAuthType.NORMAL_AUTH;
     private UartDataManagement mUartManagement = UartDataManagement.getUartInstance();
+    //for code block test
+    private int flag = 0;
+    private static byte[] uplinkBatteryCommand = {(byte) 0x53, (byte) 0x4B, (byte) 0x02, (byte) 0x05, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
+    private static byte[] uplinkLowbattery = {(byte) 0x53, (byte) 0x4B, (byte) 0x01, (byte) 0x05, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
+    private static byte[] uplinkConnectNet = {(byte) 0x53, (byte) 0x4B, (byte) 0x01, (byte) 0x38, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
+    private static byte[] uplinkAwaken = {(byte) 0x53, (byte) 0x4B, (byte) 0x01, (byte) 0x01, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
 
 //    private LexinApplicationReceiver mLexinApplicationReceiver;
     private static final String LEXIN_ACTION = "ACTION_LEXIN_TO_YINYU";
@@ -101,8 +109,8 @@ public class MenuActivity extends
 //    private boolean isGuangJiaAPPConnectNetBegin = false;  //广佳ＡＰＰ是否处于联网模式
     //处理系统运行状态　和　语音转写指令　的Handler
     public static Handler mStateManagementHandler;
-    private MusicService.MusicPlayBinder musicPlayBinder;
-    private ServiceConnection mServiceConnection = new ServiceConnection() {
+    public MusicService.MusicPlayBinder musicPlayBinder;
+    public ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
 
@@ -121,6 +129,7 @@ public class MenuActivity extends
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 //        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_menu);
+        InstanceHelper.mMenuActivity = this;
         //bind service
         Intent bindServiceIntent = new Intent(this, MusicService.class);
         boolean isBind = bindService(bindServiceIntent, mServiceConnection, this.BIND_AUTO_CREATE);
@@ -175,14 +184,39 @@ public class MenuActivity extends
 
         //test code begin 使用应用内广播测试应用间广播是否能够收到
         test.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
+//                mUartManagement.dealOtherUplinkCommand(uplinkAwaken);
+//                switch (flag){
+//                    case 0:
+//                        sendBroadcastToGuangjia("test_broadcast");
+//                        flag = 1;
+//                        break;
+//                    case 1:
+//                        mUartManagement.dealElectricQuantity(uplinkBatteryCommand);
+//                        flag = 2;
+//                        break;
+//                    case 2:
+//                        mUartManagement.dealOtherUplinkCommand(uplinkLowbattery);
+//                        flag = 3;
+//                        break;
+//                    case 3:
+//                        mUartManagement.dealOtherUplinkCommand(uplinkAwaken);
+//                        flag = 4;
+//                        break;
+//                    case 4:
+//                        mUartManagement.dealOtherUplinkCommand(uplinkConnectNet);
+//                        flag = 0;
+//                        break;
+//                }
+
                 //发送广播
 //                String broadcastIntent = "ACTION_LEXIN_TO_YINYU"; //小乐ＡＰＰ收
-                String broadcastIntent = Constant.LEXING_ACTION;    //广佳ＡＰＰ收
-                Intent intent = new Intent(broadcastIntent);
-                intent.putExtra("MESSAGE", "test_broadcast");
-                MenuActivity.this.sendBroadcast(intent);
+//                String broadcastIntent = Constant.LEXING_ACTION;    //广佳ＡＰＰ收
+//                Intent intent = new Intent(broadcastIntent);
+//                intent.putExtra("MESSAGE", "test_broadcast");
+//                MenuActivity.this.sendBroadcast(intent);
             }
         });
         //test code end
@@ -295,6 +329,18 @@ public class MenuActivity extends
                 break;
 
         }
+    }
+
+    /**
+     * function: send broadcast to guagnjia-lexin app
+     *
+     * */
+    public void sendBroadcastToGuangjia(String message){
+        //发送广播
+        String broadcastIntent = Constant.LEXING_ACTION;    //广佳ＡＰＰ收
+        Intent intent = new Intent(broadcastIntent);
+        intent.putExtra("MESSAGE", message);
+        MenuActivity.this.sendBroadcast(intent);
     }
 
     /**

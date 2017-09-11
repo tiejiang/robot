@@ -6,6 +6,8 @@ import android.os.Message;
 import android.util.Log;
 
 import com.xiaole.xiaolerobot.application.Application;
+import com.xiaole.xiaolerobot.instancefractory.InstanceHelper;
+import com.xiaole.xiaolerobot.util.Constant;
 import com.xiaole.xiaolerobot.util.serialport.SerialPort;
 
 import java.io.IOException;
@@ -26,6 +28,10 @@ public class UartDataManagement {
     public static byte[] abcd = {(byte) 0x53, (byte) 0x4B, (byte) 0x00, (byte) 0x02, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
     public static byte[] abce = {(byte) 0x53, (byte) 0x4B, (byte) 0x00, (byte) 0x03, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
     public static byte[] abcf = {(byte) 0x53, (byte) 0x4B, (byte) 0x00, (byte) 0x04, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
+
+    private static byte[] uplinkBaseCommand = {(byte) 0x53, (byte) 0x4B, (byte) 0x00, (byte) 0x00, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
+    private static byte[] uplinkBatteryBaseCommand = {(byte) 0x53, (byte) 0x4B, (byte) 0x02, (byte) 0x00, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
+    private static byte[] uplinkOtherCommand = {(byte) 0x53, (byte) 0x4B, (byte) 0x01, (byte) 0x00, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
 
     protected Application mApplication;
     protected SerialPort mSerialPort;
@@ -110,15 +116,49 @@ public class UartDataManagement {
 
     //uart receive data from mcu
     protected void onDataReceived(byte[] buffer, int size) {
+
 //        Log.d("TIEJIANG", "UartDataManagement---onDataReceived");
-        if (abc[2] == buffer[2] && abc[3] == abc[3]){
+        if (buffer[0] == uplinkBaseCommand[0] && buffer[1] == uplinkBaseCommand[1]){
             Log.d("TIEJIANG", "UartDataManagement---onDataReceived");
+            if (buffer[2] == uplinkBatteryBaseCommand[2]){
+                dealElectricQuantity(buffer);
+            }else if (buffer[2] == uplinkOtherCommand[2]){
+                dealOtherUplinkCommand(buffer);
+            }
+        }else {
+            Log.d("TIEJIANG", "UartDataManagement---onDataReceived but not active");
         }
-//        for (int i=0; i<buffer.length; i++){
-            String str = new String(buffer);
-        Log.d("TIEJIANG", "UartDataManagement---onDataReceived" + " str= " + str);
-//        }
-        //保留作为单片机上发电池状态信息
+    }
+
+    /**
+     * function: deal electric quantity
+     *
+     * */
+    public String dealElectricQuantity(byte[] battery_data_array){
+
+        byte batteryValue = battery_data_array[3];
+        String batterValueString = "";
+//        int batteryValueInt = Integer.parseInt(String.valueOf(batteryValue), 16);
+        batterValueString = String.valueOf(batteryValue);
+        Log.d("TIEJIANG", "UartDataManagement---dealElectricQuantity"+" batterValueString= "+batterValueString);
+        return batterValueString;
+    }
+
+    /**
+     * function: deal uplink command except battery quantity
+     *
+     * */
+    public void dealOtherUplinkCommand(byte[] uplink_command){
+
+        if (uplink_command[3] == Constant.FULLY_CHARGED){
+            InstanceHelper.mMenuActivity.musicPlayBinder.playStateMusic(Constant.BATTERY_CHARGING_MUSIC[1]);
+        }else if (uplink_command[3] == Constant.LOW_BATTERY){
+            InstanceHelper.mMenuActivity.musicPlayBinder.playStateMusic(Constant.BATTERY_CHARGING_MUSIC[3]);
+        }else if (uplink_command[3] == Constant.TOUCH_TO_AWAKEN){
+            InstanceHelper.mMenuActivity.sendBroadcastToGuangjia(Constant.LEXIN_AWAKEN_XIAOLE);
+        }else if (uplink_command[3] == Constant.TOUCH_TO_CONNNECT_NET){
+            InstanceHelper.mMenuActivity.sendBroadcastToGuangjia(Constant.LEXIN_CONNECT_TO_NET);
+        }
 
     }
 
@@ -130,7 +170,7 @@ public class UartDataManagement {
         return mBaseCommandBuffer;
     }
 
-    //主线程发送指令到下位机
+    //使用主线程发送指令到下位机
     public void sendCommand(byte[] command){
 
         try {

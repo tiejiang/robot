@@ -155,6 +155,15 @@ public class Constant {
     public static byte[] soundOn = {(byte) 0x00, (byte) 0x84};                    //声音开
     public static byte[] soundOff = {(byte) 0x00, (byte) 0x85};                   //声音关
 
+    public static byte FULLY_CHARGED = 0x04;  //充满电
+    public static byte LOW_BATTERY = 0x05;   //低电量
+    public static byte TOUCH_TO_AWAKEN = 0x01; //头部短按-唤醒
+    public static byte TOUCH_TO_CONNNECT_NET = 0x38; //触摸联网
+
+    //broadcast to lexin app
+    public static final String LEXIN_AWAKEN_XIAOLE = "lexin_awaken";
+    public static final String LEXIN_CONNECT_TO_NET = "lexin_connect_to_net";
+
 
     public static Vector<String> mNotEncryptionApp;
     public static void filter(){
