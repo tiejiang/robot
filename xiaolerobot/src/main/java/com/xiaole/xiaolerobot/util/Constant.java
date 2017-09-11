@@ -58,6 +58,8 @@ public class Constant {
     public static final String CONNECT_NET = "connect_net"; //开始联网
     public static final String CONNECT_NET_END = "connect_net_ok";//结束联网
 
+    public static final int BATTERY_VALUE_STATE = 90; //
+
     //小乐ＡＰＰ发广佳的广播
     public static final String LEXING_ACTION = "ACTION_YINYU_TO_LEXIN";
     public static final String PHOTO_TAKE = "photo_take";

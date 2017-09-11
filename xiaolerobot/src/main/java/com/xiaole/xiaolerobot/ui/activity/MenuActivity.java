@@ -86,12 +86,13 @@ public class MenuActivity extends
     private String nickName = "";
     private String contactID = "";
     private String[] ytxID = new String[2];
+    private String batteryValue = "00";  //whole situation battery value
     String pass = "";
     ECInitParams.LoginAuthType mLoginAuthType = ECInitParams.LoginAuthType.NORMAL_AUTH;
     private UartDataManagement mUartManagement = UartDataManagement.getUartInstance();
     //for code block test
     private int flag = 0;
-    private static byte[] uplinkBatteryCommand = {(byte) 0x53, (byte) 0x4B, (byte) 0x02, (byte) 0x05, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
+    private static byte[] uplinkBatteryCommand = {(byte) 0x53, (byte) 0x4B, (byte) 0x02, (byte) 0x0a, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
     private static byte[] uplinkLowbattery = {(byte) 0x53, (byte) 0x4B, (byte) 0x01, (byte) 0x05, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
     private static byte[] uplinkConnectNet = {(byte) 0x53, (byte) 0x4B, (byte) 0x01, (byte) 0x38, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
     private static byte[] uplinkAwaken = {(byte) 0x53, (byte) 0x4B, (byte) 0x01, (byte) 0x01, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
@@ -413,6 +414,9 @@ public class MenuActivity extends
 //                        mDataSendHandler.obtainMessage(0, mUartManagement.fillCommand(Constant.bodyStop)).sendToTarget();
                         mDataSendHandler.obtainMessage(0, mUartManagement.fillCommand(Constant.headToMiddle)).sendToTarget();
                         break;
+                    case Constant.BATTERY_VALUE_STATE:
+                        batteryValue = message;
+                        break;
 
                 }
                 // judge guangjia app is start to connect net or not
@@ -537,10 +541,10 @@ public class MenuActivity extends
 
                     jsonSignal = analysisJSONData(str_receive);
                     if (jsonSignal == 2){
-                        String handShakeSend = handleJSON("local_handed", currentIP());
+                        String handShakeSend = handleJSON("local_handed"+","+batteryValue, currentIP());
                         dp_send = new DatagramPacket(handShakeSend.getBytes(),handShakeSend.length(),dp_receive.getAddress(),21240);
                     }else if(jsonSignal == 1) {
-                        String xiaoleSetting = handleJSON("IDSetted", currentIP());
+                        String xiaoleSetting = handleJSON("IDSetted"+","+batteryValue, currentIP());
                         dp_send = new DatagramPacket(xiaoleSetting.getBytes(),xiaoleSetting.length(),dp_receive.getAddress(),21240);
                     }else if (jsonSignal == 3){
                         String localCommandSend = handleJSON("commandSended", currentIP());
@@ -562,6 +566,10 @@ public class MenuActivity extends
         }
     }
 
+    /**
+     * function: package json string
+     * @return json string
+     * */
     public String handleJSON(String state, String host_ip){
 
         String jsonString = "";
@@ -837,7 +845,7 @@ public class MenuActivity extends
         }
         //握手信号解析　//  && !isGuangJiaAPPConnectNetBegin
         if (controlCommand.equals(Constant.HAND_SHAKE)){
-            handleSendTextMessage(Constant.HAND_OK);
+            handleSendTextMessage(Constant.HAND_OK + "," + batteryValue);
             Log.d("TIEJIANG", "MenuActivity---send to mobile---handed");
         }
         //解析移动端拍照指令（通过云通讯IM发送）

@@ -15,6 +15,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.InvalidParameterException;
 
+import static com.xiaole.xiaolerobot.ui.activity.MenuActivity.mStateManagementHandler;
+
 /**
  * Created by yinyu-tiejiang on 17-8-8.
  */
@@ -141,6 +143,7 @@ public class UartDataManagement {
 //        int batteryValueInt = Integer.parseInt(String.valueOf(batteryValue), 16);
         batterValueString = String.valueOf(batteryValue);
         Log.d("TIEJIANG", "UartDataManagement---dealElectricQuantity"+" batterValueString= "+batterValueString);
+        mStateManagementHandler.obtainMessage(Constant.BATTERY_VALUE_STATE, batterValueString).sendToTarget();
         return batterValueString;
     }
 
