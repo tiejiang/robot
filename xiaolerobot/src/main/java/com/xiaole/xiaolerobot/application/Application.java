@@ -66,9 +66,9 @@ public class Application extends android.app.Application {
 //            SharedPreferences sp = getSharedPreferences(packageName + "_preferences", MODE_PRIVATE);
 //            String path = sp.getString("DEVICE", "");
 
-            String path = "/dev/ttyS0";
+//            String path = "/dev/ttyS0";
 
-//            String path = "/dev/ttyS2";
+            String path = "/dev/ttyS2";
 //            Log.d("TIEJIANG", "Application---DEVICE path= " + path);
 //            int baudrate = Integer.decode(sp.getString("BAUDRATE", "-1"));
 
