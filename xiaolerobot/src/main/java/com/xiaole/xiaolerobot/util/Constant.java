@@ -104,6 +104,8 @@ public class Constant {
                     "begin_charging",
                     "charging_me_soon_or_i_will_die"
             };
+    //sdcard卡搜索失败
+    public static String SDCARD_SEARCH_FAILED = "sdcard search failed";
 
     //向下位机发送的指令集
     public static byte[] forward = {(byte) 0x00, (byte) 0x01};

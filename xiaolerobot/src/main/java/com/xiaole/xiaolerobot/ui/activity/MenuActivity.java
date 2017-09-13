@@ -188,6 +188,8 @@ public class MenuActivity extends
 
             @Override
             public void onClick(View view) {
+
+                mDataSendHandler.obtainMessage(0, mUartManagement.fillCommand(Constant.forward)).sendToTarget();
 //                mUartManagement.dealOtherUplinkCommand(uplinkAwaken);
 //                switch (flag){
 //                    case 0:
@@ -393,14 +395,17 @@ public class MenuActivity extends
                         break;
                     //ｓｄｃａｒｄ卡媒体内容加载完毕（才能进行所有媒体库内容播放）
                     case Constant.SEARCH_MEDIASOURCE_COMPLETED_FROM_SDCARD:
-                        String musicPath = (String) myMediaList.get(10).get("musicFileUrl");
-                        Log.d("TIEJIANG", "musicPath= " + musicPath);
-                        Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + " sdcard over musicPlayBinder= " + musicPlayBinder);
+                        if (message.equals("searchMediaFailed")){
+                            musicPlayBinder.playStateMusic(Constant.SDCARD_SEARCH_FAILED);
+                        }else if (message.equals("searchMediaCompleted")){
+                            String musicPath = (String) myMediaList.get(10).get("musicFileUrl");
+                            Log.d("TIEJIANG", "musicPath= " + musicPath);
+                            Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + " sdcard over musicPlayBinder= " + musicPlayBinder);
 //                        musicPlayBinder.playStateMusic(musicPath); //此处会概率性出现musicPlayBinder为空的情况，尚未找到原因
-                        //when the sdcard media source is loaded then to get the detail data
-                        getDancingSongList(myMediaList);
-                        getWarningToneList(myMediaList);
-
+                            //when the sdcard media source is loaded then to get the detail data
+                            getDancingSongList(myMediaList);
+                            getWarningToneList(myMediaList);
+                        }
                         break;
                     case Constant.XIAOLE_DANCE_BEGIN:
                         //从语音解析到跳舞指令后开始音乐播放（get the random song from vector）
@@ -801,8 +806,13 @@ public class MenuActivity extends
 //            }
             Message mMessage = new Message();
             mMessage.what = Constant.SEARCH_MEDIASOURCE_COMPLETED_FROM_SDCARD;
-            mMessage.obj = "searchMediaCompleted";
-            mStateManagementHandler.sendMessage(mMessage);
+            if (myMediaList.size() == 0){
+                mMessage.obj = "searchMediaFailed";
+                mStateManagementHandler.sendMessage(mMessage);
+            }else{
+                mMessage.obj = "searchMediaCompleted";
+                mStateManagementHandler.sendMessage(mMessage);
+            }
         }
     }
 

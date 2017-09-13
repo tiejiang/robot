@@ -97,8 +97,8 @@ public class UartDataManagement {
                     }
                     size = mInputStream.read(buffer);
 //                    size = mInputStream.read();
-                    Log.d("TIEJIANG", "UartDataManagement---ReadThread---read"+" size= ");
-                    if (size > 0) {
+                    Log.d("TIEJIANG", "UartDataManagement---ReadThread---read"+" size= " + size);
+                    if (size == 7) {
                         onDataReceived(buffer, size);
                     }
                     Thread.sleep(1000);
@@ -158,8 +158,10 @@ public class UartDataManagement {
         }else if (uplink_command[3] == Constant.LOW_BATTERY){
             InstanceHelper.mMenuActivity.musicPlayBinder.playStateMusic(Constant.BATTERY_CHARGING_MUSIC[3]);
         }else if (uplink_command[3] == Constant.TOUCH_TO_AWAKEN){
+            Log.d("TIEJIANG", "UartDataManagement---dealOtherUplinkCommand" + " TOUCH_TO_AWAKEN");
             InstanceHelper.mMenuActivity.sendBroadcastToGuangjia(Constant.LEXIN_AWAKEN_XIAOLE);
         }else if (uplink_command[3] == Constant.TOUCH_TO_CONNNECT_NET){
+            Log.d("TIEJIANG", "UartDataManagement---dealOtherUplinkCommand" + " TOUCH_TO_CONNNECT_NET");
             InstanceHelper.mMenuActivity.sendBroadcastToGuangjia(Constant.LEXIN_CONNECT_TO_NET);
         }
 
