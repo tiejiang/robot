@@ -95,7 +95,7 @@ public class MenuActivity extends
     private static byte[] uplinkBatteryCommand = {(byte) 0x53, (byte) 0x4B, (byte) 0x02, (byte) 0x0a, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
     private static byte[] uplinkLowbattery = {(byte) 0x53, (byte) 0x4B, (byte) 0x01, (byte) 0x05, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
     private static byte[] uplinkConnectNet = {(byte) 0x53, (byte) 0x4B, (byte) 0x01, (byte) 0x38, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
-    private static byte[] uplinkAwaken = {(byte) 0x53, (byte) 0x4B, (byte) 0x01, (byte) 0x01, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
+    private static byte[] uplinkAwakenAndStopMusic = {(byte) 0x53, (byte) 0x4B, (byte) 0x01, (byte) 0x01, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
 
 //    private LexinApplicationReceiver mLexinApplicationReceiver;
     private static final String LEXIN_ACTION = "ACTION_LEXIN_TO_YINYU";
@@ -189,7 +189,7 @@ public class MenuActivity extends
             @Override
             public void onClick(View view) {
 
-                mDataSendHandler.obtainMessage(0, mUartManagement.fillCommand(Constant.forward)).sendToTarget();
+//                mDataSendHandler.obtainMessage(0, mUartManagement.fillCommand(Constant.forward)).sendToTarget();
 //                mUartManagement.dealOtherUplinkCommand(uplinkAwaken);
 //                switch (flag){
 //                    case 0:
@@ -205,7 +205,7 @@ public class MenuActivity extends
 //                        flag = 3;
 //                        break;
 //                    case 3:
-//                        mUartManagement.dealOtherUplinkCommand(uplinkAwaken);
+                        mUartManagement.dealOtherUplinkCommand(uplinkAwakenAndStopMusic);
 //                        flag = 4;
 //                        break;
 //                    case 4:

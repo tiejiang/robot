@@ -161,7 +161,7 @@ public class Constant {
 
     public static byte FULLY_CHARGED = 0x04;  //充满电
     public static byte LOW_BATTERY = 0x05;   //低电量
-    public static byte TOUCH_TO_AWAKEN = 0x01; //头部短按-唤醒
+    public static byte TOUCH_TO_AWAKEN_AND_STOP_MUSIC = 0x01; //头部短按-唤醒
     public static byte TOUCH_TO_CONNNECT_NET = 0x38; //触摸联网
 
     //broadcast to lexin app

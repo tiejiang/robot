@@ -113,7 +113,10 @@ public class MusicService extends Service{
 
         public void stopPlay(){
 
-            mDanceMediaPlayer.stop();
+            if (mDanceMediaPlayer != null){
+                mDanceMediaPlayer.stop();
+            }
+
         }
     }
 
