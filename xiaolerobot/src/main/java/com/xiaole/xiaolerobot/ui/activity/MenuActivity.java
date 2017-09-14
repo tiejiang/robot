@@ -105,7 +105,7 @@ public class MenuActivity extends
     private byte[] mBaseCommandBuffer = {(byte) 0x53, (byte) 0x4B, (byte) 0x00, (byte) 0x00, (byte) 0x0D, (byte) 0x0D, (byte) 0x0A};
 
     private Vector mDanceVector = new Vector();
-    private Vector mWarningToneVector = new Vector();
+//    private Vector mWarningToneVector = new Vector();
     private ArrayList<HashMap<String, Object>> myMediaList = new ArrayList<HashMap<String, Object>>();
 //    private boolean isGuangJiaAPPConnectNetBegin = false;  //广佳ＡＰＰ是否处于联网模式
     //处理系统运行状态　和　语音转写指令　的Handler
@@ -189,7 +189,7 @@ public class MenuActivity extends
             @Override
             public void onClick(View view) {
 
-//                mDataSendHandler.obtainMessage(0, mUartManagement.fillCommand(Constant.forward)).sendToTarget();
+                mDataSendHandler.obtainMessage(0, mUartManagement.fillCommand(Constant.forward)).sendToTarget();
 //                mUartManagement.dealOtherUplinkCommand(uplinkAwaken);
 //                switch (flag){
 //                    case 0:
@@ -205,7 +205,7 @@ public class MenuActivity extends
 //                        flag = 3;
 //                        break;
 //                    case 3:
-                        mUartManagement.dealOtherUplinkCommand(uplinkAwakenAndStopMusic);
+//                        mUartManagement.dealOtherUplinkCommand(uplinkAwakenAndStopMusic);
 //                        flag = 4;
 //                        break;
 //                    case 4:
@@ -287,9 +287,9 @@ public class MenuActivity extends
         if (mDanceVector != null){
             mDanceVector.removeAllElements();
         }
-        if(mWarningToneVector != null){
-            mWarningToneVector.removeAllElements();
-        }
+//        if(mWarningToneVector != null){
+//            mWarningToneVector.removeAllElements();
+//        }
         //unbind service
         unbindService(mServiceConnection);
     }
@@ -404,7 +404,7 @@ public class MenuActivity extends
 //                        musicPlayBinder.playStateMusic(musicPath); //此处会概率性出现musicPlayBinder为空的情况，尚未找到原因
                             //when the sdcard media source is loaded then to get the detail data
                             getDancingSongList(myMediaList);
-                            getWarningToneList(myMediaList);
+//                            getWarningToneList(myMediaList);
                         }
                         break;
                     case Constant.XIAOLE_DANCE_BEGIN:
@@ -479,19 +479,19 @@ public class MenuActivity extends
     /**
      * get the warning song list from myMediaList
      * */
-    public void getWarningToneList(ArrayList<HashMap<String, Object>> arrayList){
-
-        String tempUrlString = "";
-        if (arrayList.isEmpty()){
-            return;
-        }
-        for (int i=0; i<arrayList.size(); i++){
-            tempUrlString = (String)arrayList.get(i).get("musicFileUrl");
-            if (tempUrlString.contains("warningTone")){
-                mWarningToneVector.add(tempUrlString);
-            }
-        }
-    }
+//    public void getWarningToneList(ArrayList<HashMap<String, Object>> arrayList){
+//
+//        String tempUrlString = "";
+//        if (arrayList.isEmpty()){
+//            return;
+//        }
+//        for (int i=0; i<arrayList.size(); i++){
+//            tempUrlString = (String)arrayList.get(i).get("musicFileUrl");
+//            if (tempUrlString.contains("warningTone")){
+//                mWarningToneVector.add(tempUrlString);
+//            }
+//        }
+//    }
 
     public void initYTX(String mobile){
 
