@@ -131,6 +131,7 @@ public class MenuActivity extends
 //        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_menu);
         InstanceHelper.mMenuActivity = this;
+
         //bind service
         Intent bindServiceIntent = new Intent(this, MusicService.class);
         boolean isBind = bindService(bindServiceIntent, mServiceConnection, this.BIND_AUTO_CREATE);
@@ -275,6 +276,8 @@ public class MenuActivity extends
 //                }
 //            }
 //        }).start();
+        //send broadcast to guangjia app move task to back
+        sendBroadcastToGuangjia(Constant.MOVE_TASK_TO_BACK);
     }
 
     @Override
@@ -398,9 +401,9 @@ public class MenuActivity extends
                         if (message.equals("searchMediaFailed")){
                             musicPlayBinder.playStateMusic(Constant.SDCARD_SEARCH_FAILED);
                         }else if (message.equals("searchMediaCompleted")){
-                            String musicPath = (String) myMediaList.get(10).get("musicFileUrl");
-                            Log.d("TIEJIANG", "musicPath= " + musicPath);
-                            Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + " sdcard over musicPlayBinder= " + musicPlayBinder);
+//                            String musicPath = (String) myMediaList.get(10).get("musicFileUrl");
+//                            Log.d("TIEJIANG", "musicPath= " + musicPath);
+//                            Log.d("TIEJIANG", "MenuActivity---mStateManagementHandler" + " sdcard over musicPlayBinder= " + musicPlayBinder);
 //                        musicPlayBinder.playStateMusic(musicPath); //此处会概率性出现musicPlayBinder为空的情况，尚未找到原因
                             //when the sdcard media source is loaded then to get the detail data
                             getDancingSongList(myMediaList);

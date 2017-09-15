@@ -167,6 +167,7 @@ public class Constant {
     //broadcast to lexin app
     public static final String LEXIN_AWAKEN_XIAOLE = "lexin_awaken";
     public static final String LEXIN_CONNECT_TO_NET = "lexin_connect_to_net";
+    public static final String MOVE_TASK_TO_BACK = "move_task_to_back";
 
 
     public static Vector<String> mNotEncryptionApp;

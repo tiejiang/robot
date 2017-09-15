@@ -111,6 +111,16 @@ public class MusicService extends Service{
             });
         }
 
+        public boolean isDanceMusicPlay(){
+
+            if (mDanceMediaPlayer != null){
+                mDanceMediaPlayer.isPlaying();
+                return true;
+            }else {
+                return false;
+            }
+        }
+
         public void stopPlay(){
 
             if (mDanceMediaPlayer != null){

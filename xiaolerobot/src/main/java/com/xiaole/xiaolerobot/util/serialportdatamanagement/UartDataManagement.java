@@ -158,15 +158,19 @@ public class UartDataManagement {
         }else if (uplink_command[3] == Constant.LOW_BATTERY){
             InstanceHelper.mMenuActivity.musicPlayBinder.playStateMusic(Constant.BATTERY_CHARGING_MUSIC[3]);
         }else if (uplink_command[3] == Constant.TOUCH_TO_AWAKEN_AND_STOP_MUSIC){
+
             Log.d("TIEJIANG", "UartDataManagement---dealOtherUplinkCommand" + " TOUCH_TO_AWAKEN");
-            InstanceHelper.mMenuActivity.sendBroadcastToGuangjia(Constant.LEXIN_AWAKEN_XIAOLE);
-            //stop dance music
-            InstanceHelper.mMenuActivity.musicPlayBinder.stopPlay();
+            if (InstanceHelper.mMenuActivity.musicPlayBinder.isDanceMusicPlay()){
+                //stop dance music
+                InstanceHelper.mMenuActivity.musicPlayBinder.stopPlay();
+            }else{
+                InstanceHelper.mMenuActivity.sendBroadcastToGuangjia(Constant.LEXIN_AWAKEN_XIAOLE);
+            }
+
         }else if (uplink_command[3] == Constant.TOUCH_TO_CONNNECT_NET){
             Log.d("TIEJIANG", "UartDataManagement---dealOtherUplinkCommand" + " TOUCH_TO_CONNNECT_NET");
             InstanceHelper.mMenuActivity.sendBroadcastToGuangjia(Constant.LEXIN_CONNECT_TO_NET);
         }
-
     }
 
     //将实际指令填充到mBaseCommandBuffer里面

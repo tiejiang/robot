@@ -47,6 +47,6 @@ public class PowerBootReceiver extends BroadcastReceiver {
                 actIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(actIntent);
             }
-        }, 3000);
+        }, 7000);
     }
 }
