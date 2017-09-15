@@ -114,8 +114,11 @@ public class MusicService extends Service{
         public boolean isDanceMusicPlay(){
 
             if (mDanceMediaPlayer != null){
-                mDanceMediaPlayer.isPlaying();
-                return true;
+                if (mDanceMediaPlayer.isPlaying()){
+                    return true;
+                }else {
+                    return false;
+                }
             }else {
                 return false;
             }

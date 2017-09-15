@@ -250,19 +250,25 @@ public class MenuActivity extends
 
         // for test/debug
 //        closePort();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-//                Date   startDate   =   new Date(System.currentTimeMillis());
-                while (musicPlayBinder == null){
 
-                }
+
+        if (musicPlayBinder == null){
+            new StateMusicMediaPlayer(mMenuActivityContext).playStateMusic(selectStateMusic(Constant.POWER_ON_MUSIC));
+        }else {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+//                Date   startDate   =   new Date(System.currentTimeMillis());
+                    while (musicPlayBinder == null){
+
+                    }
 //                Date endDate = new Date(System.currentTimeMillis());
 //                long time = endDate.getTime() - startDate.getTime();
 //                Log.d("TIEJIANG", "WHILE musicPlayerBinder == null"+" time= "+time);
-                musicPlayBinder.playStateMusic(selectStateMusic(Constant.POWER_ON_MUSIC));
-            }
-        }).start();
+                    musicPlayBinder.playStateMusic(selectStateMusic(Constant.POWER_ON_MUSIC));
+                }
+            }).start();
+        }
 
         //test code
 //        new Thread(new Runnable() {

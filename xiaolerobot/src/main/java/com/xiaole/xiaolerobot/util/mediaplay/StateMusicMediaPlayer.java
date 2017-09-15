@@ -1,6 +1,7 @@
 package com.xiaole.xiaolerobot.util.mediaplay;
 
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.provider.MediaStore;
@@ -40,26 +41,32 @@ public class StateMusicMediaPlayer {
         this.filePath = path;
     }
 
-    public void playStateMusic(){
+    public void playStateMusic(final String music_name){
 
         new Thread(new Runnable() {
             @Override
             public void run() {
                 MediaPlayer mediaPlayer = new MediaPlayer();
-                try {
-//            String file_path = "/sdcard/qqmusic/song/daoxiang.mp3";
-                    //File file = new File(Environment.getExternalStorageDirectory(), "music.mp3");
-                    mediaPlayer.setDataSource(filePath);
+//            Log.d("TIEJIANG", "MusicService---MusicPlayBinder" + " mStateMediaPlayer= " + mStateMediaPlayer);
+                try{
+//                if (music_url.contains("hello_waiting_for_you")){   //开机后ＡＰＰ启动音乐
+                    AssetFileDescriptor fd = mContext.getAssets().openFd(music_name+".mp3");
+                    mediaPlayer.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
+//                }
+//                else {                     //其他状态的音乐
+//                    mStateMediaPlayer.setDataSource(music_url);
+//                }
                     mediaPlayer.prepare();
-                } catch (Exception e) {
+                }catch (Exception e){
                     e.printStackTrace();
                 }
-
-                if (!mediaPlayer.isPlaying()) {
-                    mediaPlayer.start();
-//            flag = true;
-//            refreshTimepos();
-                }
+//            mStateMediaPlayer.start();
+                mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                    @Override
+                    public void onPrepared(MediaPlayer mediaPlayer) {
+                        mediaPlayer.start();
+                    }
+                });
             }
         }).start();
 
