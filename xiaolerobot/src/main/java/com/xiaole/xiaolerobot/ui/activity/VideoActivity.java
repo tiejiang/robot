@@ -217,6 +217,7 @@ public class VideoActivity extends ECVoIPBaseActivity
             public void onCameraInit(boolean result) {
                 if (!result) {
                     Toast.makeText(VideoActivity.this, "摄像头被占用", Toast.LENGTH_SHORT).show();
+                    Log.d("TIEJIANG", "VideoActivity---摄像头被占用");
 //                    ToastUtil.showMessage("摄像头被占用");
                 }
             }

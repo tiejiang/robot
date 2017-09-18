@@ -318,7 +318,8 @@ public class VoIPCallHelper implements OnMakeCallBackListener {
                     break;
                 case ECCALL_RELEASED:    //结束当前通话
                     mHandlerVideoCall = false;
-                    Log.d("TIEJIANG", "通话结束···");
+                    Log.d("TIEJIANG", "通话结束···" + " callID= " + callId);
+                    releaseCall(callId); //add by tiejiang
                     notifyListener.onCallReleased(callId);
                     getInstance().mOnCallEventNotifyListener = null;
                     ECNotificationManager.cancelCCPNotification(ECNotificationManager.CCP_NOTIFICATOIN_ID_CALLING);
