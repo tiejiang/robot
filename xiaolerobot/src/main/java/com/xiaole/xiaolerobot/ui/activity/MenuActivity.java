@@ -56,6 +56,7 @@ import java.util.Vector;
 import static android.R.id.message;
 import static com.xiaole.xiaolerobot.instancefractory.InstanceHelper.mMenuActivity;
 import static com.xiaole.xiaolerobot.ui.helper.SDKCoreHelper.logout;
+import static com.xiaole.xiaolerobot.util.Constant.powerOnAction;
 import static com.xiaole.xiaolerobot.util.DemoUtils.getRandomInt;
 import static com.xiaole.xiaolerobot.util.serialportdatamanagement.UartDataManagement.mDataSendHandler;
 import static com.yuntongxun.ecsdk.core.ea.a.I;
@@ -284,6 +285,8 @@ public class MenuActivity extends
 //        }).start();
         //send broadcast to guangjia app move task to back
         sendBroadcastToGuangjia(Constant.MOVE_TASK_TO_BACK);
+        //start xiaole app ok and tell the MCU
+        mDataSendHandler.obtainMessage(0, mUartManagement.fillCommand(Constant.powerOnAction)).sendToTarget();
     }
 
     @Override
