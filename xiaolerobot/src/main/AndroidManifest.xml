@@ -132,6 +132,21 @@
                 <action android:name="com.xiaole.xiaolerobot.action.PERSON_VERSION" />
             </intent-filter>
         </receiver>
+
+
+        //sdk debug
+        <!---
+        <meta-data
+            android:name="DEBUG_LOG"
+            android:value="true" />
+        <meta-data
+            android:name="TRACE_LOG"
+            android:value="true" />
+        <meta-data
+            android:name="LOG_LEVEL"
+            android:value="60"
+        />
+        -->
     </application>
 
 
